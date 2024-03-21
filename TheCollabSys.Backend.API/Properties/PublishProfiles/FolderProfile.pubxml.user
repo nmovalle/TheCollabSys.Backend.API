@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>C:\publish</_PublishTargetUrl>
+    <History>True|2024-03-20T15:27:18.1024731Z;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="TheCollabSys.Backend.API.http">
+      <publishTime>03/15/2024 11:19:02</publishTime>
+    </File>
+  </ItemGroup>
+</Project>
