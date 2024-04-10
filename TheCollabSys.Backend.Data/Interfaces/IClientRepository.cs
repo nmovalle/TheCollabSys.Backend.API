@@ -2,7 +2,7 @@
 
 namespace TheCollabSys.Backend.Data.Interfaces;
 
-public interface IClientRepository : IRepository<DD_Clients>
+public interface IClientRepository : IRepository<DdClient>
 {
-    Task<IEnumerable<DD_Clients>> GetClientsByNameAsync(string name);
+    Task<IEnumerable<DdClient>> GetClientsByNameAsync(string name);
 }

@@ -8,7 +8,9 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<DD_Clients, ClientDTO>();
-        CreateMap<ClientDTO, DD_Clients>();
+        CreateMap<DdClient, ClientDTO>();
+        CreateMap<ClientDTO, DdClient>();
+        CreateMap<UserDTO, AspNetUser>();
+        CreateMap<AspNetUser, UserDTO>();
     }
 }

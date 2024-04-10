@@ -4,13 +4,13 @@ using TheCollabSys.Backend.Entity.Models;
 
 namespace TheCollabSys.Backend.Data.Repositories;
 
-public class ClientRepository : Repository<DD_Clients>, IClientRepository
+public class ClientRepository : Repository<DdClient>, IClientRepository
 {
     public ClientRepository(TheCollabsysContext context) : base(context)
     {
     }
 
-    public async Task<IEnumerable<DD_Clients>> GetClientsByNameAsync(string name)
+    public async Task<IEnumerable<DdClient>> GetClientsByNameAsync(string name)
     {
         return await _context.DD_Clients
             .Where(c => c.ClientName.Contains(name))

@@ -14,9 +14,9 @@ namespace TheCollabSys.Backend.API.Controllers
     {
         private readonly ILogger<ClientsController> _logger;
         private readonly IClientService _clientService;
-        private readonly IMapperService<ClientDTO, DD_Clients> _clientMapper;
+        private readonly IMapperService<ClientDTO, DdClient> _clientMapper;
 
-        public ClientsController(ILogger<ClientsController> logger, IClientService clientService, IMapperService<ClientDTO, DD_Clients> clientMapper)
+        public ClientsController(ILogger<ClientsController> logger, IClientService clientService, IMapperService<ClientDTO, DdClient> clientMapper)
         {
             _logger = logger;
             _clientService = clientService;
