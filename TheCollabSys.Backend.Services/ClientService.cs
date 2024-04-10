@@ -5,13 +5,13 @@ using TheCollabSys.Backend.Entity.Models;
 
 namespace TheCollabSys.Backend.Services;
 
-public class ClientService : IClientService
+public class ClientService : IClientService 
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    private readonly IMapperService<ClientDTO, DD_Clients> _clientMapper;
+    private readonly IMapperService<ClientDTO, DdClient> _clientMapper;
 
-    public ClientService(IUnitOfWork unitOfWork, IMapper mapper, IMapperService<ClientDTO, DD_Clients> clientMapper)
+    public ClientService(IUnitOfWork unitOfWork, IMapper mapper, IMapperService<ClientDTO, DdClient> clientMapper)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
@@ -32,7 +32,7 @@ public class ClientService : IClientService
         return _clientMapper.MapToSource(client);
     }
 
-    public async Task<DD_Clients> CreateClientAsync(DD_Clients clientEntity)
+    public async Task<DdClient> CreateClientAsync(DdClient clientEntity)
     {
         _unitOfWork.Clients.Add(clientEntity);
         await _unitOfWork.CompleteAsync();

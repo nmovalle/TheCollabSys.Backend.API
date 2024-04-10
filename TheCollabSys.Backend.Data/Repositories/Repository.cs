@@ -16,6 +16,11 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
         return await _context.Set<TEntity>().FindAsync(id);
     }
 
+    public async Task<TEntity> GetByIdAsync(string id)
+    {
+        return await _context.Set<TEntity>().FindAsync(id);
+    }
+
     public async Task<IEnumerable<TEntity>> GetAllAsync()
     {
         return await _context.Set<TEntity>().ToListAsync();

@@ -7,11 +7,15 @@ public class UnitOfWork : IUnitOfWork
 {
     private readonly TheCollabsysContext _context;
     public IClientRepository Clients { get; private set; }
+    public IDomainRepository DomainRepository { get; private set; }
+    public IUserRepository UserRepository { get; private set; }
 
     public UnitOfWork(TheCollabsysContext context)
     {
         _context = context;
         Clients = new ClientRepository(_context);
+        DomainRepository = new DomainRepository(_context);
+        UserRepository = new UserRepository(_context);
     }
 
     public async Task<int> CompleteAsync()

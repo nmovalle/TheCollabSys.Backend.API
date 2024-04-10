@@ -5,7 +5,7 @@ namespace TheCollabSys.Backend.Services;
 
 public interface IClientService
 {
-    Task<DD_Clients> CreateClientAsync(DD_Clients clientEntity);
+    Task<DdClient> CreateClientAsync(DdClient clientEntity);
     Task<IEnumerable<ClientDTO>> GetAllClientsAsync();
     Task<ClientDTO?> GetClientByIdAsync(int id);
     Task UpdateClientAsync(int id, ClientDTO clientDTO);

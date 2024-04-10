@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using TheCollabSys.Backend.Entity.Auth;
+using TheCollabSys.Backend.Services;
 
 namespace TheCollabSys.Backend.API.Controllers
 {
@@ -9,6 +11,14 @@ namespace TheCollabSys.Backend.API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private readonly ILogger<AuthController> _logger;
+        private readonly IDomainService _domainService;
+        public AuthController(ILogger<AuthController> logger, IDomainService domainService)
+        {
+            _logger = logger;
+            _domainService = domainService;
+        }
+
         [HttpGet("google")]
         public IActionResult GoogleLogin()
         {
@@ -33,17 +43,44 @@ namespace TheCollabSys.Backend.API.Controllers
             return Ok(new { Email = userEmail });
         }
 
-        [HttpPost("logout")]
-        public IActionResult Logout()
+        #region Google OAuth2.0
+        [HttpPost("validate-oauth-domain")]
+        public async Task<IActionResult> ValidateOAuth(OAuthRequest request)
         {
-            // Eliminar todas las cookies
-            foreach (var cookie in Request.Cookies.Keys)
-            {
-                Response.Cookies.Delete(cookie);
-            }
+            //validar si existe el domain
+            if (request.hd == null) return BadRequest();
 
-            // Devolver una respuesta indicando que las cookies se han eliminado
-            return Ok("Cookies de autenticación eliminadas correctamente");
+            var domainMaster = await _domainService.GetDomainMasterByDomain(request.hd);
+            if (domainMaster == null) return NotFound();
+
+            //validar si existe el user
+
+
+            //si no existe se crea
+
+
+            //obtener el user con sus roles: [Id, UserName, Email, RoleId, RoleName, NormalizedRoleName]
+
+
+            return Ok(request);
         }
+        #endregion
+
+        #region User
+        [HttpPost("menus")]
+        public async Task<IActionResult> GetMenus(string username)
+        {
+
+            return Ok(username);
+        }
+
+        [HttpPost("GetUserByName")]
+        public async Task<IActionResult> GetUserByName(string username)
+        {
+
+            return Ok(username);
+        }
+
+        #endregion
     }
 }
