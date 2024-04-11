@@ -14,4 +14,6 @@ public partial class AspNetRole
     public virtual ICollection<DdProposalRole> DdProposalRoles { get; set; } = new List<DdProposalRole>();
 
     public virtual ICollection<AspNetUser> Users { get; set; } = new List<AspNetUser>();
+
+    public virtual ICollection<AspNetUserRole> UserRoles { get; set; } = new List<AspNetUserRole>();
 }

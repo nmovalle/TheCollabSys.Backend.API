@@ -44,4 +44,7 @@ public partial class AspNetUser
     public virtual ICollection<DdEngineer> DdEngineers { get; set; } = new List<DdEngineer>();
 
     public virtual ICollection<AspNetRole> Roles { get; set; } = new List<AspNetRole>();
+
+    public virtual ICollection<AspNetUserRole> UserRoles { get; set; } = new List<AspNetUserRole>();
+
 }

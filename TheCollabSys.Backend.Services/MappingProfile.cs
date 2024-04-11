@@ -10,7 +10,11 @@ public class MappingProfile : Profile
     {
         CreateMap<DdClient, ClientDTO>();
         CreateMap<ClientDTO, DdClient>();
+
         CreateMap<UserDTO, AspNetUser>();
         CreateMap<AspNetUser, UserDTO>();
+
+        CreateMap<UserRoleDTO, AspNetUserRole>();
+
     }
 }
