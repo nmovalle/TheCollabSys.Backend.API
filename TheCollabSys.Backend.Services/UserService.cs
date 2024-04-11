@@ -54,7 +54,7 @@ public class UserService : IUserService
         var user = await _unitOfWork.UserRepository.GetByIdAsync(id);
         if (user == null)
         {
-            throw new ArgumentException("Client not found");
+            throw new ArgumentException("User not found");
         }
 
         _unitOfWork.UserRepository.Remove(user);

@@ -7,5 +7,6 @@ public interface IUnitOfWork : IDisposable
     IClientRepository Clients { get; }
     IDomainRepository DomainRepository { get; }
     IUserRepository UserRepository { get; }
+    IUserRoleRepository UserRoleRepository { get; }
     Task<int> CompleteAsync();
 }

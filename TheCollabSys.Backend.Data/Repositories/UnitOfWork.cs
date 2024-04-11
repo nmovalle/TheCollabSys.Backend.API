@@ -9,6 +9,7 @@ public class UnitOfWork : IUnitOfWork
     public IClientRepository Clients { get; private set; }
     public IDomainRepository DomainRepository { get; private set; }
     public IUserRepository UserRepository { get; private set; }
+    public IUserRoleRepository UserRoleRepository { get; private set; }
 
     public UnitOfWork(TheCollabsysContext context)
     {
@@ -16,6 +17,7 @@ public class UnitOfWork : IUnitOfWork
         Clients = new ClientRepository(_context);
         DomainRepository = new DomainRepository(_context);
         UserRepository = new UserRepository(_context);
+        UserRoleRepository = new UserRoleRepository(_context);
     }
 
     public async Task<int> CompleteAsync()

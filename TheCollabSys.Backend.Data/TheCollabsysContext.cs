@@ -21,6 +21,8 @@ public partial class TheCollabsysContext : DbContext
 
     public virtual DbSet<AspNetUserToken> AspNetUserTokens { get; set; }
 
+    public virtual DbSet<AspNetUserRole> AspNetUserRoles { get; set; }
+
     public virtual DbSet<DdActivity> DdActivities { get; set; }
 
     public virtual DbSet<DdAssignmentHistory> DdAssignmentHistories { get; set; }
@@ -138,6 +140,19 @@ public partial class TheCollabsysContext : DbContext
 
             entity.HasOne(d => d.User).WithMany(p => p.AspNetUserTokens).HasForeignKey(d => d.UserId);
         });
+
+        modelBuilder.Entity<AspNetUserRole>()
+            .HasKey(ur => new { ur.UserId, ur.RoleId });
+
+        modelBuilder.Entity<AspNetUserRole>()
+            .HasOne(ur => ur.User)
+            .WithMany(u => u.UserRoles)
+            .HasForeignKey(ur => ur.UserId);
+
+        modelBuilder.Entity<AspNetUserRole>()
+            .HasOne(ur => ur.Role)
+            .WithMany(r => r.UserRoles)
+            .HasForeignKey(ur => ur.RoleId);
 
         modelBuilder.Entity<DdActivity>(entity =>
         {

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TheCollabSys.Backend.API.Filters;
 using TheCollabSys.Backend.Entity.DTOs;
 using TheCollabSys.Backend.Entity.Models;
@@ -61,13 +59,7 @@ public class UserController : ControllerBase
         var existing = await _userService.GetUserByName(dto.UserName);
         if (existing != null) return BadRequest("The user is already exist");
 
-        var user = new IdentityUser()
-        {
-            UserName = dto.UserName,
-            Email = dto.Email
-        };
-
-        dto.Id = user.Id;
+        dto.Id = Guid.NewGuid().ToString();
         var entity = _mapperService.MapToDestination(dto);
         var savedEntity = await _userService.AddUserAsync(entity);
         var savedDTO = _mapperService.MapToSource(savedEntity);
