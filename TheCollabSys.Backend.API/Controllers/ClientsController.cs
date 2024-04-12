@@ -60,5 +60,40 @@ namespace TheCollabSys.Backend.API.Controllers
 
             return CreatedAtAction(nameof(GetClientByIdAsync), new { id = savedClientDTO.ClientID }, savedClientDTO);
         }
+
+        [HttpPut("{id}")]      
+        public async Task<IActionResult> UpdateClient(int id, [FromBody] ClientDTO clientDTO)
+        {
+          try
+            {
+                    // Directly await the asynchronous method without assigning its result to a variable
+              await _clientService.UpdateClientAsync(id, clientDTO);
+              return NoContent();
+            }
+                catch (ArgumentException ex)
+                {
+                    return NotFound(ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    // Log the exception
+                    return StatusCode(500, "An error occurred while updating the client");
+                }
+         } 
+        // Delete client
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteClientAsync(int id)
+        {
+            try
+            {
+                await _clientService.DeleteClientAsync(id);
+                return NoContent(); // 204 No Content for successful deletion
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message); // 404 Not Found if the client does not exist
+            }
+        }
+        
     }
 }
