@@ -1,6 +1,8 @@
-﻿namespace TheCollabSys.Backend.API.Token;
+﻿using TheCollabSys.Backend.Entity.Response;
+
+namespace TheCollabSys.Backend.API.Token;
 
 public interface IJwtTokenGenerator
 {
-    Task<string> GenerateToken(string username);
+    Task<AuthTokenResponse> GenerateToken(string username);
 }

@@ -28,9 +28,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Remove="OptionSetup\JwtBearerOptionsSetup.cs" />
+	  <Compile Remove="OptionSetup\JwtOptions.cs" />
+	  <Compile Remove="OptionSetup\JwtOptionsSetup.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\TheCollabSys.Backend.Data\TheCollabSys.Backend.Data.csproj" />
 		<ProjectReference Include="..\TheCollabSys.Backend.Entity\TheCollabSys.Backend.Entity.csproj" />
 		<ProjectReference Include="..\TheCollabSys.Backend.Services\TheCollabSys.Backend.Services.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="OptionSetup\" />
 	</ItemGroup>
 
 </Project>

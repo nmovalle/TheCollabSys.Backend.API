@@ -18,7 +18,7 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
-app.UseCors();
+app.UseCors("CorsPolicy");
 
 app.UseRouting();
 

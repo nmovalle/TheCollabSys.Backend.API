@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TheCollabSys.Backend.API.Filters;
 using TheCollabSys.Backend.Entity.DTOs;
@@ -7,9 +8,12 @@ using TheCollabSys.Backend.Services;
 
 namespace TheCollabSys.Backend.API.Controllers
 {
-    //[Authorize]
+
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
+    [ServiceFilter(typeof(GlobalExceptionFilter))]
+    [ServiceFilter(typeof(ModelStateFilter))]
     public class ClientsController : ControllerBase
     {
         private readonly ILogger<ClientsController> _logger;

@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using TheCollabSys.Backend.API.Token;
 using TheCollabSys.Backend.Entity.Auth;
 using TheCollabSys.Backend.Entity.DTOs;
 using TheCollabSys.Backend.Entity.Models;
+using TheCollabSys.Backend.Entity.Response;
 using TheCollabSys.Backend.Services;
 
 namespace TheCollabSys.Backend.API.Controllers
@@ -19,12 +19,20 @@ namespace TheCollabSys.Backend.API.Controllers
         private readonly IDomainService _domainService;
         private readonly IUserService _userService;
         private readonly IUserRoleService _userRoleService;
-        public AuthController(ILogger<AuthController> logger, IDomainService domainService, IUserService userService, IUserRoleService userRoleService)
+        private readonly IJwtTokenGenerator _jwtTokenGenerator;
+        public AuthController(
+            ILogger<AuthController> logger, 
+            IDomainService domainService, 
+            IUserService userService, 
+            IUserRoleService userRoleService,
+            IJwtTokenGenerator jwtTokenGenerator
+            )
         {
             _logger = logger;
             _domainService = domainService;
             _userService = userService;
             _userRoleService = userRoleService;
+            _jwtTokenGenerator = jwtTokenGenerator;
         }
 
         #region Google
@@ -80,8 +88,9 @@ namespace TheCollabSys.Backend.API.Controllers
 
             // Obtener el usuario con su rol
             var userRole = await GetUserRole(user.UserName);
+            var token = await GenerateToken(user.UserName);
 
-            return Ok(userRole);
+            return Ok(new LoginResponse { UserRole= userRole, AuthToken = token });
         }
 
         private bool IsValidRequest(OAuthRequest request)
@@ -149,7 +158,10 @@ namespace TheCollabSys.Backend.API.Controllers
         #endregion
 
         #region Token
-
+        private async Task<AuthTokenResponse> GenerateToken(string username) 
+        {
+            return await _jwtTokenGenerator.GenerateToken(username);
+        }
 
         #endregion
     }
