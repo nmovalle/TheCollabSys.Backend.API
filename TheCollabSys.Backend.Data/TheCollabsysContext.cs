@@ -86,6 +86,7 @@ public partial class TheCollabsysContext : DbContext
     public virtual DbSet<DdUsersProfile> DdUsersProfiles { get; set; }
 
     public virtual DbSet<DdView> DdViews { get; set; }
+    public virtual DbSet<Token> Token { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -548,6 +549,20 @@ public partial class TheCollabsysContext : DbContext
 
             entity.Property(e => e.ViewName)
                 .HasMaxLength(255)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<Token>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.RefreshToken)
+                .IsRequired()
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.Username)
+                .IsRequired()
+                .HasMaxLength(256)
                 .IsUnicode(false);
         });
 
