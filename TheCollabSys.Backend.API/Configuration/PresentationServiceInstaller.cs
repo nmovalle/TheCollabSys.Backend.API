@@ -11,12 +11,12 @@ namespace TheCollabSys.Backend.API.Configuration
             // Configuración de CORS
             services.AddCors(options =>
             {
-                options.AddDefaultPolicy(builder =>
+                options.AddPolicy("CorsPolicy", builder =>
                 {
-                    builder.AllowAnyOrigin()
-                           .AllowAnyHeader()
-                           .AllowAnyMethod()
-                           .AllowAnyOrigin();
+                    builder.AllowAnyOrigin() // Permite cualquier origen
+                           .AllowAnyMethod() // Permite cualquier método HTTP
+                           .AllowAnyHeader() // Permite cualquier encabezado
+                           .WithExposedHeaders("Content-Disposition"); // Expone encabezados personalizados si es necesario
                 });
             });
 
@@ -63,21 +63,6 @@ namespace TheCollabSys.Backend.API.Configuration
                     }
                 });
             });
-
-            ////Configuración de autenticación
-            //services.AddAuthentication(options =>
-            //{
-            //    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            //    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            //    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-            //})
-            //.AddCookie()
-            //.AddGoogle(googleOptions =>
-            //{
-            //    googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
-            //    googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
-            //    googleOptions.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            //});
         }
     }
 }
