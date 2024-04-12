@@ -34,7 +34,7 @@ namespace TheCollabSys.Backend.API.Configuration
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "The Collabsys API", Version = "v1" });
 
                 // Configura la autenticación JWT en Swagger
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

@@ -7,9 +7,8 @@ using TheCollabSys.Backend.Services;
 
 namespace TheCollabSys.Backend.API.Controllers
 {
-    
+    //[Authorize]
     [Route("api/[controller]")]
-    [Authorize]
     [ApiController]
     public class ClientsController : ControllerBase
     {
