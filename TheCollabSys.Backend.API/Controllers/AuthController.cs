@@ -14,6 +14,7 @@ namespace TheCollabSys.Backend.API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        //cambios pendientes...
         private readonly ILogger<AuthController> _logger;
         private readonly IDomainService _domainService;
         private readonly IUserService _userService;
