@@ -11,6 +11,8 @@ namespace TheCollabSys.Backend.API.Controllers
     //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
+    [ServiceFilter(typeof(GlobalExceptionFilter))]
+    [ServiceFilter(typeof(ModelStateFilter))]
     public class ClientsController : ControllerBase
     {
         private readonly ILogger<ClientsController> _logger;
