@@ -26,6 +26,7 @@ namespace TheCollabSys.Backend.API.Controllers
             _userRoleService = userRoleService;
         }
 
+        #region Google
         [HttpGet("google")]
         public IActionResult GoogleLogin()
         {
@@ -49,6 +50,7 @@ namespace TheCollabSys.Backend.API.Controllers
 
             return Ok(new { Email = userEmail });
         }
+        #endregion
 
         #region Google OAuth2.0
         [HttpPost("validate-oauth-domain")]
@@ -91,6 +93,9 @@ namespace TheCollabSys.Backend.API.Controllers
             return await _domainService.GetDomainMasterByDomain(domain);
         }
 
+        #endregion
+
+        #region User
         private async Task<UserDTO?> GetUser(string email)
         {
             return await _userService.GetUserByName(email);
@@ -126,9 +131,6 @@ namespace TheCollabSys.Backend.API.Controllers
             return await _userRoleService.GetUserRoleByUserName(username);
         }
 
-        #endregion
-
-        #region User
         [HttpPost("menus")]
         public async Task<IActionResult> GetMenus(string username)
         {
@@ -142,6 +144,11 @@ namespace TheCollabSys.Backend.API.Controllers
 
             return Ok(username);
         }
+
+        #endregion
+
+        #region Token
+
 
         #endregion
     }

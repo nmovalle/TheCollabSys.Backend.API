@@ -8,5 +8,6 @@ public interface IUnitOfWork : IDisposable
     IDomainRepository DomainRepository { get; }
     IUserRepository UserRepository { get; }
     IUserRoleRepository UserRoleRepository { get; }
+    ITokenRepository TokenRepository { get; }
     Task<int> CompleteAsync();
 }
