@@ -9,7 +9,7 @@ using TheCollabSys.Backend.Services;
 namespace TheCollabSys.Backend.API.Controllers
 {
 
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     [ServiceFilter(typeof(GlobalExceptionFilter))]
