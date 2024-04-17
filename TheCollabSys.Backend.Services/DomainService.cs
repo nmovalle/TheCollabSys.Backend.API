@@ -1,12 +1,4 @@
-﻿using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using TheCollabSys.Backend.Data.Interfaces;
-using TheCollabSys.Backend.Entity.DTOs;
+﻿using TheCollabSys.Backend.Data.Interfaces;
 using TheCollabSys.Backend.Entity.Models;
 
 namespace TheCollabSys.Backend.Services;

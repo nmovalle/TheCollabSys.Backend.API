@@ -15,6 +15,12 @@ public class MappingProfile : Profile
         CreateMap<AspNetUser, UserDTO>();
 
         CreateMap<UserRoleDTO, AspNetUserRole>();
+        CreateMap<AspNetUserRole, UserRoleDTO>();
 
+        CreateMap<AspNetRole, RoleDTO>();
+        CreateMap<RoleDTO, AspNetRole>();
+
+        CreateMap<DdProposalRole, ProposalRoleDTO>();
+        CreateMap<ProposalRoleDTO, DdProposalRole>();
     }
 }

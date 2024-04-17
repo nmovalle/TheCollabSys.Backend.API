@@ -1,5 +1,4 @@
-﻿using TheCollabSys.Backend.API.Controllers;
-using TheCollabSys.Backend.API.Filters;
+﻿using TheCollabSys.Backend.API.Filters;
 using TheCollabSys.Backend.API.Middlewares;
 using TheCollabSys.Backend.API.Token;
 using TheCollabSys.Backend.Services;
@@ -16,6 +15,8 @@ public class InfrastructureServiceInstaller : IServiceInstaller
         services.AddScoped<IDomainService, DomainService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IUserRoleService, UserRoleService>();
+        services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<IProposalRoleService, ProposalRoleService>();
 
         services.AddScoped(typeof(IMapperService<,>), typeof(MapperService<,>));
 
