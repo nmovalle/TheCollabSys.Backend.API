@@ -12,6 +12,7 @@ public class UnitOfWork : IUnitOfWork
     public IUserRoleRepository UserRoleRepository { get; private set; }
     public ITokenRepository TokenRepository { get; private set; }
     public IRoleRepository RoleRepository { get; private set; }
+    public IProposalRoleRepository ProposalRoleRepository { get; private set; }
 
     public UnitOfWork(TheCollabsysContext context)
     {
@@ -22,6 +23,7 @@ public class UnitOfWork : IUnitOfWork
         UserRoleRepository = new UserRoleRepository(_context);
         TokenRepository = new TokenRepository(_context);
         RoleRepository = new RoleRepository(_context);
+        ProposalRoleRepository = new ProposalRoleRepository(_context);
     }
 
     public async Task<int> CompleteAsync()

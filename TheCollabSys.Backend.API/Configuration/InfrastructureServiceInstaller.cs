@@ -16,6 +16,7 @@ public class InfrastructureServiceInstaller : IServiceInstaller
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IUserRoleService, UserRoleService>();
         services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<IProposalRoleService, ProposalRoleService>();
 
         services.AddScoped(typeof(IMapperService<,>), typeof(MapperService<,>));
 
