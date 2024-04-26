@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using TheCollabSys.Backend.Data.Interfaces;
 using TheCollabSys.Backend.Entity.DTOs;
 using TheCollabSys.Backend.Entity.Models;
@@ -11,6 +12,10 @@ public class UserRepository : Repository<AspNetUser>, IUserRepository
     {
     }
 
+    public async Task<AspNetUser?> GetByUserName(string username)
+    {
+        return await _context.AspNetUsers.FirstOrDefaultAsync(u => u.UserName == username);
+    }
     public async Task<UserDTO?> GetUserByName(string? username)
     {
         return await _context.AspNetUsers
