@@ -34,6 +34,7 @@ public class ClientService : IClientService
 
     public async Task<DdClient> CreateClientAsync(DdClient clientEntity)
     {
+        clientEntity.DateCreated = DateTime.Now;
         _unitOfWork.Clients.Add(clientEntity);
         await _unitOfWork.CompleteAsync();
         return clientEntity;
@@ -47,6 +48,7 @@ public class ClientService : IClientService
             throw new ArgumentException("Client not found");
         }
 
+        existingClient.DateUpdate = DateTime.Now;
         _clientMapper.Map(clientDTO, existingClient);
         _unitOfWork.Clients.Update(existingClient);
 

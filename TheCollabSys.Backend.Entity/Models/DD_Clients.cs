@@ -13,6 +13,9 @@ public class DD_Clients
     public string Email { get; set; }
 
     public byte[]? Logo { get; set; }
-
+    public string FileType { get; set; }
+    public bool Active { get; set; }
+    public string UserID { get; set; }
     public DateTime? DateCreated { get; set; }
+    public DateTime? DateUpdate { get; set; }
 }
