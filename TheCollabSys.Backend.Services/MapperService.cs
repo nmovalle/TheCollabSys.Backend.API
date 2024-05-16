@@ -11,9 +11,28 @@ public class MapperService<TSource, TDestination> : IMapperService<TSource, TDes
         _mapper = mapper;
     }
 
-    public TDestination Map(TSource source, TDestination destination)
+    public TDestination Map(TSource source, TDestination destination, List<string>? excludeProperties = null)
     {
-        return _mapper.Map(source, destination);
+        var sourceProperties = typeof(TSource).GetProperties();
+        var destinationProperties = typeof(TDestination).GetProperties();
+
+        foreach (var sourceProperty in sourceProperties)
+        {
+            if (excludeProperties != null && excludeProperties.Contains(sourceProperty.Name))
+            {
+                continue; // Si la propiedad está en la lista de exclusiones, omitirla
+            }
+
+            var destinationProperty = destinationProperties.FirstOrDefault(x => x.Name == sourceProperty.Name);
+
+            if (destinationProperty != null && destinationProperty.CanWrite)
+            {
+                var value = sourceProperty.GetValue(source, null);
+                destinationProperty.SetValue(destination, value, null);
+            }
+        }
+
+        return destination;
     }
 
     public TDestination MapToDestination(TSource source)

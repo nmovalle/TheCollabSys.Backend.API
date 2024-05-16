@@ -26,5 +26,7 @@ public class InfrastructureServiceInstaller : IServiceInstaller
         services.AddTransient<ExceptionHandlingMiddleware>();
         services.AddScoped<GlobalExceptionFilter>();
         services.AddScoped<ModelStateFilter>();
+
+        services.AddScoped<UserIdFilter>();
     }
 }

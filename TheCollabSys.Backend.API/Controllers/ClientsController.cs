@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using TheCollabSys.Backend.API.Filters;
 using TheCollabSys.Backend.Entity.DTOs;
 using TheCollabSys.Backend.Entity.Models;
@@ -14,6 +15,7 @@ namespace TheCollabSys.Backend.API.Controllers
     [ApiController]
     [ServiceFilter(typeof(GlobalExceptionFilter))]
     [ServiceFilter(typeof(ModelStateFilter))]
+    [ServiceFilter(typeof(UserIdFilter))]
     public class ClientsController : ControllerBase
     {
         private readonly ILogger<ClientsController> _logger;
@@ -54,35 +56,75 @@ namespace TheCollabSys.Backend.API.Controllers
         }
 
         [HttpPost]
-        [ActionName(nameof(CreateClientAsync))]
-        public async Task<IActionResult> CreateClientAsync(ClientDTO clientDTO)
+        public async Task<IActionResult> CreateClient([FromForm] string clientDTO, [FromForm] IFormFile? file)
         {
-            var clientEntity = _clientMapper.MapToDestination(clientDTO);
-            var savedClientEntity = await _clientService.CreateClientAsync(clientEntity);
-            var savedClientDTO = _clientMapper.MapToSource(savedClientEntity);
-
-            return CreatedAtAction(nameof(GetClientByIdAsync), new { id = savedClientDTO.ClientID }, savedClientDTO);
+            return await HandleClientOperationAsync(clientDTO, file, async (model) =>
+            {
+                var clientEntity = _clientMapper.MapToDestination(model);
+                var savedClientEntity = await _clientService.CreateClientAsync(clientEntity);
+                var savedClientDTO = _clientMapper.MapToSource(savedClientEntity);
+                return CreatedAtAction(nameof(GetClientByIdAsync), new { id = savedClientDTO.ClientID }, savedClientDTO);
+            });
         }
 
-        [HttpPut("{id}")]      
-        public async Task<IActionResult> UpdateClient(int id, [FromBody] ClientDTO clientDTO)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateClient(int id, [FromForm] string clientDTO, [FromForm] IFormFile? file)
         {
-          try
+            var existingClient = await _clientService.GetClientByIdAsync(id);
+            if (existingClient == null)
             {
-                    // Directly await the asynchronous method without assigning its result to a variable
-              await _clientService.UpdateClientAsync(id, clientDTO);
-              return NoContent();
+                return NotFound();
             }
-                catch (ArgumentException ex)
+
+            return await HandleClientOperationAsync(clientDTO, file, async (model) =>
+            {
+                await _clientService.UpdateClientAsync(id, model);
+                return NoContent();
+            });
+        }
+
+        private async Task<IActionResult> HandleClientOperationAsync(string clientDTO, IFormFile? file, Func<ClientDTO, Task<IActionResult>> clientOperation)
+        {
+            try
+            {
+                var userId = HttpContext.Request.Headers["User-Id"];
+                var model = JsonConvert.DeserializeObject<ClientDTO>(clientDTO);
+                if (model == null)
                 {
-                    return NotFound(ex.Message);
+                    return BadRequest("Invalid client data");
                 }
-                catch (Exception ex)
+
+                if (file != null && file.Length > 0)
                 {
-                    // Log the exception
-                    return StatusCode(500, "An error occurred while updating the client");
+                    (string fileType, byte[] fileBytes) = await ProcessFileAsync(file);
+                    model.Filetype = fileType;
+                    model.Logo = fileBytes;
                 }
-         } 
+
+                model.UserId = userId;
+                return await clientOperation(model);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while processing the client");
+            }
+        }
+
+        private async Task<(string fileType, byte[] fileBytes)> ProcessFileAsync(IFormFile file)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                await file.CopyToAsync(memoryStream);
+                var fileBytes = memoryStream.ToArray();
+                var fileType = file.ContentType;
+                return (fileType, fileBytes);
+            }
+        }
+
         // Delete client
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteClientAsync(int id)
@@ -97,6 +139,5 @@ namespace TheCollabSys.Backend.API.Controllers
                 return NotFound(ex.Message); // 404 Not Found if the client does not exist
             }
         }
-        
     }
 }

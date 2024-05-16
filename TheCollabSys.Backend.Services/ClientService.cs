@@ -48,8 +48,11 @@ public class ClientService : IClientService
             throw new ArgumentException("Client not found");
         }
 
-        existingClient.DateUpdate = DateTime.Now;
-        _clientMapper.Map(clientDTO, existingClient);
+        clientDTO.DateUpdate = DateTime.Now;
+
+        var excludeProperties = new List<string> { "DateCreated" };
+        _clientMapper.Map(clientDTO, existingClient, excludeProperties);
+
         _unitOfWork.Clients.Update(existingClient);
 
         await _unitOfWork.CompleteAsync();

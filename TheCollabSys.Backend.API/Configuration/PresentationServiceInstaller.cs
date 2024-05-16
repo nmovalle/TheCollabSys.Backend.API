@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using TheCollabSys.Backend.API.Filters;
 
@@ -62,6 +63,11 @@ namespace TheCollabSys.Backend.API.Configuration
                         Array.Empty<string>()
                     }
                 });
+            });
+
+            services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = 104857600;
             });
         }
     }
