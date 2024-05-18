@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using TheCollabSys.Backend.API.Filters;
 using TheCollabSys.Backend.Entity.DTOs;
@@ -16,7 +17,7 @@ namespace TheCollabSys.Backend.API.Controllers
     [ServiceFilter(typeof(GlobalExceptionFilter))]
     [ServiceFilter(typeof(ModelStateFilter))]
     [ServiceFilter(typeof(UserIdFilter))]
-    public class ClientsController : ControllerBase
+    public class ClientsController : BaseController
     {
         private readonly ILogger<ClientsController> _logger;
         private readonly IClientService _clientService;
@@ -29,23 +30,39 @@ namespace TheCollabSys.Backend.API.Controllers
             _clientMapper = clientMapper;
         }
 
-        [HttpGet("GetAllClientsAsync", Name = "GetAllClientsAsync")]
+        [HttpGet]
         [ActionName(nameof(GetAllClientsAsync))]
         public async Task<IActionResult> GetAllClientsAsync()
         {
-            return Ok(await _clientService.GetAllClientsAsync());
+            return await ExecuteAsync(async () =>
+            {
+                var clientEnumerable = _clientService.GetAllClientsAsync();
+
+                await foreach (var client in clientEnumerable)
+                {
+                    return CreateResponse("success", client, "success");
+                }
+
+                return CreateNotFoundResponse("error", "Register not found");
+            });
         }
 
-        [HttpGet("GetClientByIdAsync/{id}", Name = "GetClientByIdAsync")]
+        [HttpGet("{id}")]
         [ActionName(nameof(GetClientByIdAsync))]
         public async Task<IActionResult> GetClientByIdAsync(int id)
         {
-            var client = await _clientService.GetClientByIdAsync(id);
-            if (client == null)
-                return NotFound();
+            return await ExecuteAsync(async () =>
+            {
+                var queryableData = await _clientService.GetClientByIdAsync(id);
+                var data = await queryableData.ToListAsync();
 
-            return Ok(client);
+                if (data == null || !data.Any())
+                    return CreateNotFoundResponse<object>(null, "register was not found");
+
+                return CreateResponse("success", data, "success");
+            });
         }
+
 
         [HttpGet("SearchClientsByName/{name}", Name = "SearchClientsByName")]
         [ActionName(nameof(SearchClientsByName))]
