@@ -37,10 +37,16 @@ namespace TheCollabSys.Backend.API.Controllers
             return await ExecuteAsync(async () =>
             {
                 var clientEnumerable = _clientService.GetAllClientsAsync();
+                var clients = new List<ClientDTO>();
 
                 await foreach (var client in clientEnumerable)
                 {
-                    return CreateResponse("success", client, "success");
+                    clients.Add(client);
+                }
+
+                if (clients.Any())
+                {
+                    return CreateResponse("success", clients, "success");
                 }
 
                 return CreateNotFoundResponse("error", "Register not found");
@@ -59,7 +65,7 @@ namespace TheCollabSys.Backend.API.Controllers
                 if (data == null || !data.Any())
                     return CreateNotFoundResponse<object>(null, "register was not found");
 
-                return CreateResponse("success", data, "success");
+                return CreateResponse("success", data[0], "success");
             });
         }
 
