@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using System.Data.Entity;
 using TheCollabSys.Backend.Data;
 using TheCollabSys.Backend.Data.Interfaces;
 using TheCollabSys.Backend.Entity.DTOs;
@@ -75,9 +73,7 @@ public class ClientService : IClientService
     {
         var existingClient = await _unitOfWork.Clients.GetByIdAsync(id);
         if (existingClient == null)
-        {
             throw new ArgumentException("Client not found");
-        }
 
         clientDTO.DateUpdate = DateTime.Now;
 

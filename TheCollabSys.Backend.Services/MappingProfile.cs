@@ -22,5 +22,8 @@ public class MappingProfile : Profile
 
         CreateMap<DdProposalRole, ProposalRoleDTO>();
         CreateMap<ProposalRoleDTO, DdProposalRole>();
+
+        CreateMap<EmployerDTO, DdEmployer>();
+
     }
 }

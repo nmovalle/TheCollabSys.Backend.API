@@ -9,5 +9,7 @@ public interface IUnitOfWork : IDisposable
     ITokenRepository TokenRepository { get; }
     IRoleRepository RoleRepository { get; }
     IProposalRoleRepository ProposalRoleRepository { get; }
+    IEmployerRepository EmployerRepository { get; }
+
     Task<int> CompleteAsync();
 }

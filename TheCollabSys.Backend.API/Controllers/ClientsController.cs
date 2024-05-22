@@ -81,7 +81,7 @@ namespace TheCollabSys.Backend.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateClient([FromForm] string clientDTO, [FromForm] IFormFile? file)
         {
-            return await HandleClientOperationAsync(clientDTO, file, async (model) =>
+            return await this.HandleClientOperationAsync<ClientDTO>(clientDTO, file, async (model) =>
             {
                 var clientEntity = _clientMapper.MapToDestination(model);
                 var savedClientEntity = await _clientService.CreateClientAsync(clientEntity);
@@ -99,53 +99,11 @@ namespace TheCollabSys.Backend.API.Controllers
                 return NotFound();
             }
 
-            return await HandleClientOperationAsync(clientDTO, file, async (model) =>
+            return await this.HandleClientOperationAsync<ClientDTO>(clientDTO, file, async (model) =>
             {
                 await _clientService.UpdateClientAsync(id, model);
                 return NoContent();
             });
-        }
-
-        private async Task<IActionResult> HandleClientOperationAsync(string clientDTO, IFormFile? file, Func<ClientDTO, Task<IActionResult>> clientOperation)
-        {
-            try
-            {
-                var userId = HttpContext.Request.Headers["User-Id"];
-                var model = JsonConvert.DeserializeObject<ClientDTO>(clientDTO);
-                if (model == null)
-                {
-                    return BadRequest("Invalid client data");
-                }
-
-                if (file != null && file.Length > 0)
-                {
-                    (string fileType, byte[] fileBytes) = await ProcessFileAsync(file);
-                    model.Filetype = fileType;
-                    model.Logo = fileBytes;
-                }
-
-                model.UserId = userId;
-                return await clientOperation(model);
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "An error occurred while processing the client");
-            }
-        }
-
-        private async Task<(string fileType, byte[] fileBytes)> ProcessFileAsync(IFormFile file)
-        {
-            using (var memoryStream = new MemoryStream())
-            {
-                await file.CopyToAsync(memoryStream);
-                var fileBytes = memoryStream.ToArray();
-                var fileType = file.ContentType;
-                return (fileType, fileBytes);
-            }
         }
 
         // Delete client
