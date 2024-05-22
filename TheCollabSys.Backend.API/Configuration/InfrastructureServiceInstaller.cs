@@ -11,12 +11,15 @@ public class InfrastructureServiceInstaller : IServiceInstaller
     {
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
-        services.AddScoped<IClientService, ClientService>();
         services.AddScoped<IDomainService, DomainService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IUserRoleService, UserRoleService>();
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IProposalRoleService, ProposalRoleService>();
+
+        services.AddScoped<IClientService, ClientService>();
+        services.AddScoped<IEmployerService, EmployerService>();
+
 
         services.AddScoped(typeof(IMapperService<,>), typeof(MapperService<,>));
 

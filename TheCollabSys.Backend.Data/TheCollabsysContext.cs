@@ -37,7 +37,7 @@ public partial class TheCollabsysContext : DbContext
 
     public virtual DbSet<DdDomainMaster> DD_DomainMaster { get; set; }
 
-    public virtual DbSet<DdEmployer> DdEmployers { get; set; }
+    public virtual DbSet<DdEmployer> DD_Employers { get; set; }
 
     public virtual DbSet<DdEngineer> DdEngineers { get; set; }
 

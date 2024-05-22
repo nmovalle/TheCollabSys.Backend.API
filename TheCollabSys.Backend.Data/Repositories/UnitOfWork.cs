@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using TheCollabSys.Backend.Data.Interfaces;
-using TheCollabSys.Backend.Entity.Models;
+﻿using TheCollabSys.Backend.Data.Interfaces;
 
 namespace TheCollabSys.Backend.Data.Repositories;
 
@@ -15,6 +13,8 @@ public class UnitOfWork : IUnitOfWork
     public ITokenRepository TokenRepository { get; private set; }
     public IRoleRepository RoleRepository { get; private set; }
     public IProposalRoleRepository ProposalRoleRepository { get; private set; }
+    public IEmployerRepository EmployerRepository { get; private set; }
+
 
     public UnitOfWork(TheCollabsysContext context)
     {
@@ -27,6 +27,7 @@ public class UnitOfWork : IUnitOfWork
         TokenRepository = new TokenRepository(_context);
         RoleRepository = new RoleRepository(_context);
         ProposalRoleRepository = new ProposalRoleRepository(_context);
+        EmployerRepository = new EmployerRepository(_context);
     }
 
     public async Task<int> CompleteAsync()
