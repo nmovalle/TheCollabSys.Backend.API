@@ -77,7 +77,7 @@ public partial class TheCollabsysContext : DbContext
 
     public virtual DbSet<DdProposalRole> DD_ProposalRoles { get; set; }
 
-    public virtual DbSet<DdSkill> DdSkills { get; set; }
+    public virtual DbSet<DdSkill> DD_Skills { get; set; }
 
     public virtual DbSet<DdSoftware> DdSoftwares { get; set; }
 

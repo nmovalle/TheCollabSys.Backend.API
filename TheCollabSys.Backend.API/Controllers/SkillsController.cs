@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TheCollabSys.Backend.API.Filters;
 using TheCollabSys.Backend.Entity.DTOs;
 using TheCollabSys.Backend.Entity.Models;
@@ -8,32 +6,30 @@ using TheCollabSys.Backend.Services;
 
 namespace TheCollabSys.Backend.API.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     [ServiceFilter(typeof(GlobalExceptionFilter))]
     [ServiceFilter(typeof(ModelStateFilter))]
-    [ServiceFilter(typeof(UserIdFilter))]
-    public class EmployersController : BaseController
+    public class SkillsController : BaseController
     {
-        private readonly IEmployerService _service;
-        private readonly IMapperService<EmployerDTO, DdEmployer> _mapper;
-        public EmployersController(
-            IEmployerService employerService,
-            IMapperService<EmployerDTO, DdEmployer> mapperService
+        private readonly ISkillService _service;
+        private readonly IMapperService<SkillDTO, DdSkill> _mapper;
+        public SkillsController(
+            ISkillService service,
+            IMapperService<SkillDTO, DdSkill> mapperService
             )
         {
-            _service = employerService;
+            _service = service;
             _mapper = mapperService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllEmployers()
+        public async Task<IActionResult> GetAllSkills()
         {
             return await ExecuteAsync(async () =>
             {
                 var ienumerable = _service.GetAll();
-                var data = new List<EmployerDTO>();
+                var data = new List<SkillDTO>();
 
                 await foreach (var item in ienumerable)
                 {
@@ -50,23 +46,23 @@ namespace TheCollabSys.Backend.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetEmployerById(int id)
+        public async Task<IActionResult> GetSkillById(int id)
         {
             return await ExecuteAsync(async () =>
             {
                 var data = await _service.GetByIdAsync(id);
 
                 if (data == null)
-                    return CreateNotFoundResponse<object>(null,"register not found");
+                    return CreateNotFoundResponse<object>(null, "register not found");
 
                 return CreateResponse("success", data, "success");
             });
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateEmployer([FromForm] string dto, [FromForm] IFormFile? file)
+        public async Task<IActionResult> CreateSkill([FromForm] string dto)
         {
-            return await this.HandleClientOperationAsync<EmployerDTO>(dto, file, async (model) =>
+            return await this.HandleClientOperationAsync<SkillDTO>(dto, null, async (model) =>
             {
                 var entity = _mapper.MapToDestination(model);
                 var savedEntity = await _service.Create(entity);
@@ -75,13 +71,13 @@ namespace TheCollabSys.Backend.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateEmployer(int id, [FromForm] string dto, [FromForm] IFormFile? file)
+        public async Task<IActionResult> UpdateSkill(int id, [FromForm] string dto)
         {
             var existing = await _service.GetByIdAsync(id);
             if (existing == null)
-                return CreateNotFoundResponse<object>(null,"register not found");
+                return CreateNotFoundResponse<object>(null, "register not found");
 
-            return await this.HandleClientOperationAsync<EmployerDTO>(dto, file, async (model) =>
+            return await this.HandleClientOperationAsync<SkillDTO>(dto, null, async (model) =>
             {
                 await _service.Update(id, model);
                 return NoContent();
@@ -89,7 +85,7 @@ namespace TheCollabSys.Backend.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployer(int id)
+        public async Task<IActionResult> DeleteSkill(int id)
         {
             try
             {
