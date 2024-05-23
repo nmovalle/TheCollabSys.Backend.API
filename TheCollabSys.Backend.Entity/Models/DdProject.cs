@@ -18,6 +18,8 @@ public partial class DdProject
     public DateTime? EndDate { get; set; }
 
     public int StatusId { get; set; }
+    public string? UserId { get; set; }
+    public DateTime? DateUpdate { get; set; }
 
     public virtual DdClient Client { get; set; } = null!;
 

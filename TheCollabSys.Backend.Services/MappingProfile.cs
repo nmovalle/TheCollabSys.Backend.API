@@ -27,6 +27,7 @@ public class MappingProfile : Profile
 
         CreateMap<SkillDTO, DdSkill>();
 
-
+        CreateMap<ProjectDTO, DdProject>();
+        
     }
 }

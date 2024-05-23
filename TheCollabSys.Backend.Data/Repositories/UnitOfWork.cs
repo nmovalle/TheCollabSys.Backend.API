@@ -15,6 +15,7 @@ public class UnitOfWork : IUnitOfWork
     public IProposalRoleRepository ProposalRoleRepository { get; private set; }
     public IEmployerRepository EmployerRepository { get; private set; }
     public ISkillRepository SkillRepository { get; private set; }
+    public IProjectRepository ProjectRepository { get; private set; }
 
 
     public UnitOfWork(TheCollabsysContext context)
@@ -30,6 +31,7 @@ public class UnitOfWork : IUnitOfWork
         ProposalRoleRepository = new ProposalRoleRepository(_context);
         EmployerRepository = new EmployerRepository(_context);
         SkillRepository = new SkillRepository(_context);
+        ProjectRepository = new ProjectRepository(_context);
     }
 
     public async Task<int> CompleteAsync()
