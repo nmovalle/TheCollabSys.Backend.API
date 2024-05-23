@@ -63,7 +63,7 @@ public partial class TheCollabsysContext : DbContext
 
     public virtual DbSet<DdProfileConfigView> DdProfileConfigViews { get; set; }
 
-    public virtual DbSet<DdProject> DdProjects { get; set; }
+    public virtual DbSet<DdProject> DD_Projects { get; set; }
 
     public virtual DbSet<DdProjectAssignment> DdProjectAssignments { get; set; }
 
