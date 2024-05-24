@@ -6,8 +6,8 @@ using TheCollabSys.Backend.Services;
 
 namespace TheCollabSys.Backend.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     [ServiceFilter(typeof(GlobalExceptionFilter))]
     [ServiceFilter(typeof(ModelStateFilter))]
     public class SkillsController : BaseController
@@ -70,14 +70,14 @@ namespace TheCollabSys.Backend.API.Controllers
             });
         }
 
-        [HttpPut("{id}")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> UpdateSkill(int id, [FromForm] string dto)
         {
             var existing = await _service.GetByIdAsync(id);
             if (existing == null)
-                return CreateNotFoundResponse<object>(null, "register not found");
+                return NotFound("Register not found");
 
-            return await this.HandleClientOperationAsync<SkillDTO>(dto, null, async (model) =>
+            return await HandleClientOperationAsync<SkillDTO>(dto, null, async (model) =>
             {
                 await _service.Update(id, model);
                 return NoContent();

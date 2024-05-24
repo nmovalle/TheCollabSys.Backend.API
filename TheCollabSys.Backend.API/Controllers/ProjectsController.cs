@@ -74,7 +74,7 @@ public class ProjectsController : BaseController
         });
     }
 
-    [HttpPut("{id}")]
+    [HttpPost("{id}")]
     public async Task<IActionResult> UpdateProject(int id, [FromForm] string dto, [FromForm] IFormFile? file)
     {
         var existing = await _service.GetByIdAsync(id);

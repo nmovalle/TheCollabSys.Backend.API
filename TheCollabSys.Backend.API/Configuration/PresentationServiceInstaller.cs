@@ -64,11 +64,6 @@ namespace TheCollabSys.Backend.API.Configuration
                     }
                 });
             });
-
-            services.Configure<FormOptions>(options =>
-            {
-                options.MultipartBodyLengthLimit = 104857600;
-            });
         }
     }
 }

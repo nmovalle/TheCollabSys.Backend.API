@@ -74,7 +74,7 @@ namespace TheCollabSys.Backend.API.Controllers
             });
         }
 
-        [HttpPut("{id}")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> UpdateEmployer(int id, [FromForm] string dto, [FromForm] IFormFile? file)
         {
             var existing = await _service.GetByIdAsync(id);

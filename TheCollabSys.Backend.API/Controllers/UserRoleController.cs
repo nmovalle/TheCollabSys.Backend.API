@@ -48,7 +48,7 @@ namespace TheCollabSys.Backend.API.Controllers
             return Ok(entity);
         }
 
-        [HttpPut("UpdateUserRoleByUserName/{username}/{newRoleId}", Name = "UpdateUserRoleByUserName")]
+        [HttpPost("UpdateUserRoleByUserName/{username}/{newRoleId}", Name = "UpdateUserRoleByUserName")]
         [ActionName(nameof(UpdateUserRoleByUserName))]
         public async Task<IActionResult> UpdateUserRoleByUserName(string username, string newRoleId)
         {

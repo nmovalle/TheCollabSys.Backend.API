@@ -90,7 +90,7 @@ namespace TheCollabSys.Backend.API.Controllers
             });
         }
 
-        [HttpPut("{id}")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> UpdateClient(int id, [FromForm] string clientDTO, [FromForm] IFormFile? file)
         {
             var existingClient = await _clientService.GetClientByIdAsync(id);
