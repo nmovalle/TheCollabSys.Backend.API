@@ -69,7 +69,7 @@ public partial class TheCollabsysContext : DbContext
 
     public virtual DbSet<DdProjectEquipment> DdProjectEquipments { get; set; }
 
-    public virtual DbSet<DdProjectSkill> DdProjectSkills { get; set; }
+    public virtual DbSet<DdProjectSkill> DD_ProjectSkills { get; set; }
 
     public virtual DbSet<DdProjectSoftware> DdProjectSoftwares { get; set; }
 
