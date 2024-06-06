@@ -60,4 +60,9 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
         _context.Set<TEntity>().Remove(entity);
     }
+
+    public void RemoveRange(IEnumerable<TEntity> entities)
+    {
+        _context.Set<TEntity>().RemoveRange(entities);
+    }
 }

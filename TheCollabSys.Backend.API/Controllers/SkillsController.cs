@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TheCollabSys.Backend.API.Filters;
 using TheCollabSys.Backend.Entity.DTOs;
 using TheCollabSys.Backend.Entity.Models;
@@ -6,6 +8,7 @@ using TheCollabSys.Backend.Services;
 
 namespace TheCollabSys.Backend.API.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("api/[controller]")]
     [ServiceFilter(typeof(GlobalExceptionFilter))]
@@ -70,7 +73,8 @@ namespace TheCollabSys.Backend.API.Controllers
             });
         }
 
-        [HttpPost("{id}")]
+        [HttpPut]
+        [Route("{id}")]
         public async Task<IActionResult> UpdateSkill(int id, [FromForm] string dto)
         {
             var existing = await _service.GetByIdAsync(id);
