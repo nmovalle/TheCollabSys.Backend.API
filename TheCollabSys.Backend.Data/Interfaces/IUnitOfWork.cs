@@ -13,6 +13,7 @@ public interface IUnitOfWork : IDisposable
     ISkillRepository SkillRepository { get; }
     IProjectRepository ProjectRepository { get; }
     IProjectSkillRepository ProjectSkillRepository { get; }
+    IEngineerRepository EngineerRepository { get; }
 
     Task<int> CompleteAsync();
 }
