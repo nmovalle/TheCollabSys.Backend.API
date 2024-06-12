@@ -22,6 +22,7 @@ public class InfrastructureServiceInstaller : IServiceInstaller
         services.AddScoped<ISkillService, SkillService>();
         services.AddScoped<IProjectService, ProjectService>();
         services.AddScoped<IProjectSkillService, ProjectSkillService>();
+        services.AddScoped<IEngineerService, EngineerService>();
 
 
         services.AddScoped(typeof(IMapperService<,>), typeof(MapperService<,>));

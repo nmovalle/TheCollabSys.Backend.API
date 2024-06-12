@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TheCollabSys.Backend.API.Extensions;
 using TheCollabSys.Backend.API.Filters;
 using TheCollabSys.Backend.Entity.DTOs;
 using TheCollabSys.Backend.Entity.Models;
@@ -32,24 +33,17 @@ namespace TheCollabSys.Backend.API.Controllers
         {
             return await ExecuteAsync(async () =>
             {
-                var ienumerable = _service.GetAll();
-                var data = new List<EmployerDTO>();
-
-                await foreach (var item in ienumerable)
-                {
-                    data.Add(item);
-                }
+                var data = await _service.GetAll().ToListAsync();
 
                 if (data.Any())
-                {
                     return CreateResponse("success", data, "success");
-                }
 
-                return CreateNotFoundResponse<object>(null, "Register not found");
+                return CreateNotFoundResponse<object>(null, "Registers not founds");
             });
         }
 
-        [HttpGet("{id}")]
+        [HttpGet]
+        [Route("{id}")]
         public async Task<IActionResult> GetEmployerById(int id)
         {
             return await ExecuteAsync(async () =>
@@ -74,7 +68,8 @@ namespace TheCollabSys.Backend.API.Controllers
             });
         }
 
-        [HttpPost("{id}")]
+        [HttpPut]
+        [Route("{id}")]
         public async Task<IActionResult> UpdateEmployer(int id, [FromForm] string dto, [FromForm] IFormFile? file)
         {
             var existing = await _service.GetByIdAsync(id);
@@ -88,7 +83,8 @@ namespace TheCollabSys.Backend.API.Controllers
             });
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete]
+        [Route("{id}")]
         public async Task<IActionResult> DeleteEmployer(int id)
         {
             try

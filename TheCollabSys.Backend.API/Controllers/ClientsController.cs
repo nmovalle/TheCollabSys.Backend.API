@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using TheCollabSys.Backend.API.Extensions;
 using TheCollabSys.Backend.API.Filters;
 using TheCollabSys.Backend.Entity.DTOs;
 using TheCollabSys.Backend.Entity.Models;
@@ -36,24 +37,17 @@ namespace TheCollabSys.Backend.API.Controllers
         {
             return await ExecuteAsync(async () =>
             {
-                var clientEnumerable = _clientService.GetAllClientsAsync();
-                var clients = new List<ClientDTO>();
+                var data = await _clientService.GetAllClientsAsync().ToListAsync();
 
-                await foreach (var client in clientEnumerable)
-                {
-                    clients.Add(client);
-                }
+                if (data.Any())
+                    return CreateResponse("success", data, "success");
 
-                if (clients.Any())
-                {
-                    return CreateResponse("success", clients, "success");
-                }
-
-                return CreateNotFoundResponse("error", "Register not found");
+                return CreateNotFoundResponse<object>(null, "Registers not founds");
             });
         }
 
-        [HttpGet("{id}")]
+        [HttpGet]
+        [Route("{id}")]
         [ActionName(nameof(GetClientByIdAsync))]
         public async Task<IActionResult> GetClientByIdAsync(int id)
         {
@@ -90,7 +84,8 @@ namespace TheCollabSys.Backend.API.Controllers
             });
         }
 
-        [HttpPost("{id}")]
+        [HttpPut]
+        [Route("{id}")]
         public async Task<IActionResult> UpdateClient(int id, [FromForm] string clientDTO, [FromForm] IFormFile? file)
         {
             var existingClient = await _clientService.GetClientByIdAsync(id);
@@ -106,8 +101,8 @@ namespace TheCollabSys.Backend.API.Controllers
             });
         }
 
-        // Delete client
-        [HttpDelete("{id}")]
+        [HttpDelete]
+        [Route("{id}")]
         public async Task<IActionResult> DeleteClientAsync(int id)
         {
             try
