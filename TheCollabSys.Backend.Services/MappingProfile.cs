@@ -34,6 +34,7 @@ public class MappingProfile : Profile
         CreateMap<DdEngineer, EngineerDTO>();
         CreateMap<EngineerDTO, DdEngineer>();
 
-
+        CreateMap<DdEngineerSkill, EngineerSkillDTO>();
+        CreateMap<EngineerSkillDTO, DdEngineerSkill>();
     }
 }
