@@ -79,6 +79,10 @@ public partial class TheCollabsysContext : DbContext
 
     public virtual DbSet<DdSkill> DD_Skills { get; set; }
 
+    public virtual DbSet<DdSkillCategory> DD_SkillCategories { get; set; }
+
+    public DbSet<DdSkillSubcategory> DD_SkillSubcategories { get; set; }
+
     public virtual DbSet<DdSoftware> DdSoftwares { get; set; }
 
     public virtual DbSet<DdUser> DdUsers { get; set; }
@@ -511,7 +515,32 @@ public partial class TheCollabsysContext : DbContext
         {
             entity.HasKey(e => e.SkillId);
 
+
             entity.Property(e => e.SkillName).HasMaxLength(100);
+
+            entity.HasOne(d => d.Category).WithMany(p => p.DdSkills)
+                .HasForeignKey(d => d.CategoryId);
+
+            entity.HasOne(d => d.Subcategory).WithMany(p => p.DdSkills)
+                .HasForeignKey(d => d.SubcategoryId);
+        });
+
+        modelBuilder.Entity<DdSkillCategory>(entity =>
+        {
+            entity.HasKey(e => e.CategoryId);
+
+            entity.Property(e => e.CategoryName).IsUnicode(false);
+        });
+
+        modelBuilder.Entity<DdSkillSubcategory>(entity =>
+        {
+            entity.HasKey(e => e.SubcategoryId);
+
+            entity.Property(e => e.SubcategoryName).HasMaxLength(100);
+
+            entity.HasOne(d => d.Category).WithMany(p => p.DdSkillSubcategories)
+                .HasForeignKey(d => d.CategoryId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<DdSoftware>(entity =>

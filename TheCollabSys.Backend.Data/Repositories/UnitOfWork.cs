@@ -19,6 +19,7 @@ public class UnitOfWork : IUnitOfWork
     public IProjectSkillRepository ProjectSkillRepository { get; private set; }
     public IEngineerRepository EngineerRepository { get; private set; }
     public IEngineerSkillRepository EngineerSkillRepository { get; private set; }
+    public ISkillCategoryRepository SkillCategoryRepository { get; private set; }
 
 
     public UnitOfWork(TheCollabsysContext context)
@@ -38,6 +39,7 @@ public class UnitOfWork : IUnitOfWork
         ProjectSkillRepository = new ProjectSkillRepository(_context);
         EngineerRepository = new EngineerRepository(_context);
         EngineerSkillRepository = new EngineerSkillRepository(_context);
+        SkillCategoryRepository = new SkillCategoryRepository(_context);
     }
 
     public async Task<int> CompleteAsync()
