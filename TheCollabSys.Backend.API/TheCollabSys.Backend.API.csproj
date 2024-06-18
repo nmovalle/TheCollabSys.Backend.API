@@ -29,6 +29,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Models\**" />
+	  <Content Remove="Models\**" />
+	  <EmbeddedResource Remove="Models\**" />
+	  <None Remove="Models\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Compile Remove="OptionSetup\JwtBearerOptionsSetup.cs" />
 	  <Compile Remove="OptionSetup\JwtOptions.cs" />
 	  <Compile Remove="OptionSetup\JwtOptionsSetup.cs" />

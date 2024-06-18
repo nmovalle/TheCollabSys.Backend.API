@@ -45,7 +45,6 @@ public class ProjectService : IProjectService
                     })
             .AsAsyncEnumerable();
 
-
         return data;
     }
 

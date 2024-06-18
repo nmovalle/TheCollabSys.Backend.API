@@ -15,6 +15,7 @@ public interface IUnitOfWork : IDisposable
     IProjectSkillRepository ProjectSkillRepository { get; }
     IEngineerRepository EngineerRepository { get; }
     IEngineerSkillRepository EngineerSkillRepository { get; }
+    ISkillCategoryRepository SkillCategoryRepository { get; }
 
     Task<int> CompleteAsync();
 }
