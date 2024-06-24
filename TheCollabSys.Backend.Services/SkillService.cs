@@ -28,7 +28,11 @@ public class SkillService : ISkillService
             .Select(c => new SkillDTO
             {
                 SkillId = c.SkillId,
-                SkillName = c.SkillName
+                SkillName = c.SkillName,
+                CategoryId = c.CategoryId,
+                CategoryName = c.Category.CategoryName,
+                SubcategoryId = c.SubcategoryId,
+                SubcategoryName = c.Subcategory.SubcategoryName
             })
             .AsAsyncEnumerable();
 
@@ -42,7 +46,11 @@ public class SkillService : ISkillService
             .Select(c => new SkillDTO
             {
                 SkillId = c.SkillId,
-                SkillName = c.SkillName
+                SkillName = c.SkillName,
+                CategoryId = c.CategoryId,
+                CategoryName = c.Category.CategoryName,
+                SubcategoryId = c.SubcategoryId,
+                SubcategoryName = c.Subcategory.SubcategoryName
             })
             .FirstOrDefaultAsync();
 
