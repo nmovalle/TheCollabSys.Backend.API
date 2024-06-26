@@ -6,6 +6,7 @@ namespace TheCollabSys.Backend.Services;
 public interface ISkillCategoryService
 {
     IAsyncEnumerable<SkillCategoryDTO> GetAll();
+    IAsyncEnumerable<SkillCategoriesDetailDTO> GetAllWithCategories();
     Task<SkillCategoryDTO?> GetByIdAsync(int id);
     Task<DdSkillCategory> Create(DdSkillCategory entity);
     Task Update(int id, SkillCategoryDTO dto);

@@ -3,6 +3,7 @@ using TheCollabSys.Backend.Data;
 using TheCollabSys.Backend.Entity.DTOs;
 using TheCollabSys.Backend.Entity.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace TheCollabSys.Backend.Services;
 
@@ -25,6 +26,24 @@ public class SkillService : ISkillService
     public IAsyncEnumerable<SkillDTO> GetAll()
     {
         var data = _unitOfWork.SkillRepository.GetAllQueryable()
+            .Select(c => new SkillDTO
+            {
+                SkillId = c.SkillId,
+                SkillName = c.SkillName,
+                CategoryId = c.CategoryId,
+                CategoryName = c.Category.CategoryName,
+                SubcategoryId = c.SubcategoryId,
+                SubcategoryName = c.Subcategory.SubcategoryName
+            })
+            .AsAsyncEnumerable();
+
+        return data;
+    }
+
+    public IAsyncEnumerable<SkillDTO> GetByCategories(UniqueIdsCategoriesDTO uniqueIdsCategories)
+    {
+        var data = _unitOfWork.SkillRepository.GetAllQueryable()
+            .Where(s => uniqueIdsCategories.CategoryIds.Contains((int)s.CategoryId) && uniqueIdsCategories.SubcategoryIds.Contains((int)s.SubcategoryId))
             .Select(c => new SkillDTO
             {
                 SkillId = c.SkillId,
