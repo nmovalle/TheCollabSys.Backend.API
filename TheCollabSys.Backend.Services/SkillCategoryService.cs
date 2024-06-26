@@ -44,6 +44,44 @@ public class SkillCategoryService : ISkillCategoryService
         return data;
     }
 
+    private string GenerateKey(ref int counter)
+    {
+        return (counter++).ToString();
+    }
+
+    public async IAsyncEnumerable<SkillCategoriesDetailDTO> GetAllWithCategories()
+    {
+        var categories = await _unitOfWork.SkillCategoryRepository
+            .GetAllQueryable()
+            .Include(c => c.DdSkillSubcategories)
+            .ToListAsync();
+
+        int parentKeyCounter = 0;
+
+        foreach (var category in categories)
+        {
+            var children = category.DdSkillSubcategories.Select((subcategory, index) => new SkillCategoriesDetailDTO
+            {
+                key = $"{parentKeyCounter}-{index}",
+                label = subcategory.SubcategoryName,
+                data = $"categoryId: {category.CategoryId}, subcategoryId: {subcategory.SubcategoryId}",
+                icon = "pi pi-fw pi-cog",
+                children = null
+            }).ToList();
+
+            yield return new SkillCategoriesDetailDTO
+            {
+                key = $"{parentKeyCounter}",
+                label = category.CategoryName,
+                data = $"categoryId: {category.CategoryId}",
+                icon = "pi pi-fw pi-inbox",
+                children = children.Any() ? children : null
+            };
+
+            parentKeyCounter++;
+        }
+    }
+
     public async Task<DdSkillCategory> Create(DdSkillCategory entity)
     {
         _unitOfWork.SkillCategoryRepository.Add(entity);

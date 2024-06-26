@@ -57,6 +57,21 @@ public class SkillCategoriesController : BaseController
         });
     }
 
+    [HttpGet]
+    [Route("GetAllWithCategories")]
+    public async Task<IActionResult> GetAllWithCategories()
+    {
+        return await ExecuteAsync(async () =>
+        {
+            var data = await _service.GetAllWithCategories().ToListAsync();
+
+            if (data.Any())
+                return CreateResponse("success", data, "success");
+
+            return CreateNotFoundResponse<object>(null, "Registers not founds");
+        });
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateSkillCategory([FromForm] string dto)
     {

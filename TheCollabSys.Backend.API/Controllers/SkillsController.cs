@@ -6,6 +6,7 @@ using TheCollabSys.Backend.API.Filters;
 using TheCollabSys.Backend.Entity.DTOs;
 using TheCollabSys.Backend.Entity.Models;
 using TheCollabSys.Backend.Services;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TheCollabSys.Backend.API.Controllers
 {
@@ -36,6 +37,20 @@ namespace TheCollabSys.Backend.API.Controllers
 
                 if (data.Any())
                     return CreateResponse("success", data, "success");
+
+                return CreateNotFoundResponse<object>(null, "Registers not founds");
+            });
+        }
+
+        [HttpPost]
+        [Route("GetByCategories")]
+        public async Task<IActionResult> GetByCategories([FromForm] string dto)
+        {
+            return await this.HandleClientOperationAsync<UniqueIdsCategoriesDTO>(dto, null, async (model) =>
+            {
+                var result = await _service.GetByCategories(model).ToListAsync();
+                if (result.Any())
+                    return CreateResponse("success", result, "success");
 
                 return CreateNotFoundResponse<object>(null, "Registers not founds");
             });
