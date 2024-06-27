@@ -21,11 +21,13 @@ public class EngineerSkillService : IEngineerSkillService
         var data = (from ps in _unitOfWork.EngineerSkillRepository.GetAllQueryable()
                     join p in _unitOfWork.EngineerRepository.GetAllQueryable() on ps.EngineerId equals p.EngineerId
                     join s in _unitOfWork.SkillRepository.GetAllQueryable() on ps.SkillId equals s.SkillId
-                    group new { ps, p, s } by new { ps.EngineerId, p.EngineerName } into grouped
+                    group new { ps, p, s } by new { ps.EngineerId, p.EngineerName, p.FirstName, p.LastName } into grouped
                     select new EngineerSkillDetailDTO
                     {
                         EngineerId = grouped.Key.EngineerId,
                         EngineerName = grouped.Key.EngineerName,
+                        FirstName = grouped.Key.FirstName,
+                        LastName = grouped.Key.LastName,
                         Skills = grouped.Select(g => new SkillLevelDTO
                         {
                             SkillId = g.s.SkillId,
