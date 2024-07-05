@@ -27,6 +27,8 @@ public class InfrastructureServiceInstaller : IServiceInstaller
         services.AddScoped<ISkillCategoryService, SkillCategoryService>();
         services.AddScoped<ISkillSubcategoryService, SkillSubcategoryService>();
 
+        services.AddScoped<IMenuRolesService, MenuRolesService>();
+
 
         services.AddScoped(typeof(IMapperService<,>), typeof(MapperService<,>));
 
