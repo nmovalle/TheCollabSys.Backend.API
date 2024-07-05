@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using TheCollabSys.Backend.API.Extensions;
 using TheCollabSys.Backend.API.Token;
 using TheCollabSys.Backend.Entity.Auth;
 using TheCollabSys.Backend.Entity.DTOs;
@@ -14,18 +17,19 @@ namespace TheCollabSys.Backend.API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        //cambios pendientes...
         private readonly ILogger<AuthController> _logger;
         private readonly IDomainService _domainService;
         private readonly IUserService _userService;
         private readonly IUserRoleService _userRoleService;
         private readonly IJwtTokenGenerator _jwtTokenGenerator;
+        private readonly IMenuRolesService _menuRolesService;
         public AuthController(
             ILogger<AuthController> logger, 
             IDomainService domainService, 
             IUserService userService, 
             IUserRoleService userRoleService,
-            IJwtTokenGenerator jwtTokenGenerator
+            IJwtTokenGenerator jwtTokenGenerator,
+            IMenuRolesService menuRolesService
             )
         {
             _logger = logger;
@@ -33,6 +37,7 @@ namespace TheCollabSys.Backend.API.Controllers
             _userService = userService;
             _userRoleService = userRoleService;
             _jwtTokenGenerator = jwtTokenGenerator;
+            _menuRolesService = menuRolesService;
         }
 
         #region Google
@@ -141,11 +146,23 @@ namespace TheCollabSys.Backend.API.Controllers
             return await _userRoleService.GetUserRoleByUserName(username);
         }
 
-        [HttpPost("menus")]
-        public async Task<IActionResult> GetMenus(string username)
+        [HttpGet]
+        [Route("menus")]
+        public async Task<IActionResult> GetAllMenuRoles()
         {
+            var data = await _menuRolesService.GetAll().ToListAsync();
+            return Ok(data);
+        }
 
-            return Ok(username);
+        [HttpGet]
+        [Route("menus/{username}")]
+        public async Task<IActionResult> GetAllMenuRolesById(string username)
+        {
+            var user = await _userRoleService.GetUserRoleByUserName(username);
+            if (user == null) { return NotFound("User not found.");  }
+
+            var data = await _menuRolesService.GetByRole(user.RoleId).ToListAsync();
+            return Ok(data);
         }
 
         [HttpPost("GetUserByName")]

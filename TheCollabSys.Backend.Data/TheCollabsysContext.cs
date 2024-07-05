@@ -90,7 +90,14 @@ public partial class TheCollabsysContext : DbContext
     public virtual DbSet<DdUsersProfile> DdUsersProfiles { get; set; }
 
     public virtual DbSet<DdView> DdViews { get; set; }
+
     public virtual DbSet<Token> Token { get; set; }
+
+    public virtual DbSet<DdMenu> DD_Menu { get; set; }
+
+    public virtual DbSet<DdSubMenu> DD_SubMenu { get; set; }
+
+    public virtual DbSet<DdMenuRole> DD_MenuRoles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -144,6 +151,15 @@ public partial class TheCollabsysContext : DbContext
             entity.Property(e => e.Name).HasMaxLength(128);
 
             entity.HasOne(d => d.User).WithMany(p => p.AspNetUserTokens).HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<AspNetRole>(entity =>
+        {
+            entity.HasIndex(e => e.NormalizedName, "RoleNameIndex")
+                .IsUnique();
+
+            entity.Property(e => e.Name).HasMaxLength(256);
+            entity.Property(e => e.NormalizedName).HasMaxLength(256);
         });
 
         modelBuilder.Entity<AspNetUserRole>()
@@ -592,6 +608,48 @@ public partial class TheCollabsysContext : DbContext
                 .IsRequired()
                 .HasMaxLength(256)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<DdMenu>(entity =>
+        {
+            entity.HasKey(e => e.MenuId);
+
+            entity.Property(e => e.Description).IsUnicode(false);
+            entity.Property(e => e.MenuName)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<DdMenuRole>(entity =>
+        {
+            entity.HasKey(e => e.MenuRoleId);
+
+            entity.Property(e => e.RoleId).HasMaxLength(450);
+
+            entity.HasOne(d => d.Role).WithMany(p => p.DdMenuRoles)
+                .HasForeignKey(d => d.RoleId);
+
+            entity.HasOne(d => d.SubMenu).WithMany(p => p.DdMenuRoles)
+                .HasForeignKey(d => d.SubMenuId);
+        });
+
+        modelBuilder.Entity<DdSubMenu>(entity =>
+        {
+            entity.HasKey(e => e.SubMenuId);
+
+            entity.Property(e => e.Description).IsUnicode(false);
+            entity.Property(e => e.Icon)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.RouterLink)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.SubMenuName)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.Menu).WithMany(p => p.DdSubMenus)
+                .HasForeignKey(d => d.MenuId);
         });
 
         base.OnModelCreating(modelBuilder);
