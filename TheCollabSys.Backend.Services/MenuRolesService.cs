@@ -1,17 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TheCollabSys.Backend.Data.Interfaces;
 using TheCollabSys.Backend.Entity.DTOs;
+using TheCollabSys.Backend.Entity.Models;
 
 namespace TheCollabSys.Backend.Services;
 
 public class MenuRolesService : IMenuRolesService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapperService<MenuRoleDTO, DdMenuRole> _mapperService;
     public MenuRolesService(
-        IUnitOfWork unitOfWork
+        IUnitOfWork unitOfWork,
+        IMapperService<MenuRoleDTO, DdMenuRole> mapperService
         )
     {
         _unitOfWork = unitOfWork;
+        _mapperService = mapperService;
     }
 
     public async IAsyncEnumerable<MenuRoleDetailDTO> GetAll()
@@ -61,7 +65,6 @@ public class MenuRolesService : IMenuRolesService
         }
     }
 
-
     public async IAsyncEnumerable<MenuRoleDetailDTO> GetByRole(string roleId)
     {
         var menus = await _unitOfWork.MenuRepository.GetAllQueryable()
@@ -105,5 +108,83 @@ public class MenuRolesService : IMenuRolesService
                 yield return menuDetail;
             }
         }
+    }
+
+    public IAsyncEnumerable<MenuRoleDTO> GetMenuRoles()
+    {
+        var data = _unitOfWork.MenuRolesRepository.GetAllQueryable()
+            .Select(c => new MenuRoleDTO
+            {
+                MenuRoleId = c.MenuRoleId,
+                RoleId = c.RoleId,
+                RoleName = c.Role.Name,
+                SubMenuId = c.SubMenuId,
+                SubMenuName = c.SubMenu.SubMenuName,
+                View = c.View,
+                Add = c.Add,
+                Edit = c.Edit,
+                Delete = c.Delete,
+                Export = c.Export,
+                Import = c.Import
+            })
+            .OrderBy(c => c.RoleId)
+            .AsAsyncEnumerable();
+
+        return data;
+    }
+
+    public async Task<MenuRoleDTO?> GetByIdAsync(int id)
+    {
+        var resp = await _unitOfWork.MenuRolesRepository.GetAllQueryable()
+            .Where(c => c.MenuRoleId == id)
+            .Select(c => new MenuRoleDTO
+            {
+                MenuRoleId = c.MenuRoleId,
+                RoleId = c.RoleId,
+                RoleName = c.Role.Name,
+                SubMenuId = c.SubMenuId,
+                SubMenuName = c.SubMenu.SubMenuName,
+                View = c.View,
+                Add = c.Add,
+                Edit = c.Edit,
+                Delete = c.Delete,
+                Export = c.Export,
+                Import = c.Import
+            }) 
+            .OrderBy(c => c.RoleId)
+            .FirstOrDefaultAsync();
+
+        return resp;
+    }
+
+    public async Task<DdMenuRole> Create(DdMenuRole entity)
+    {
+        _unitOfWork.MenuRolesRepository.Add(entity);
+        await _unitOfWork.CompleteAsync();
+        return entity;
+    }
+
+    public async Task Update(int id, MenuRoleDTO dto)
+    {
+        var existing = await _unitOfWork.MenuRolesRepository.GetByIdAsync(id);
+        if (existing == null)
+            throw new ArgumentException("menu role not found");
+
+        _mapperService.Map(dto, existing);
+
+        _unitOfWork.MenuRolesRepository.Update(existing);
+        await _unitOfWork.CompleteAsync();
+    }
+
+    public async Task Delete(int id)
+    {
+        var entity = await _unitOfWork.MenuRolesRepository.GetByIdAsync(id);
+        if (entity == null)
+        {
+            throw new ArgumentException("menu role not found");
+        }
+
+        _unitOfWork.MenuRolesRepository.Remove(entity);
+        await _unitOfWork.CompleteAsync();
     }
 }

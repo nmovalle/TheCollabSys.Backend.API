@@ -639,7 +639,7 @@ public partial class TheCollabsysContext : DbContext
 
             entity.Property(e => e.Description).IsUnicode(false);
             entity.Property(e => e.Icon)
-                .HasMaxLength(20)
+                .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.RouterLink)
                 .HasMaxLength(50)

@@ -14,21 +14,21 @@ namespace TheCollabSys.Backend.API.Controllers;
 [Route("api/[controller]")]
 [ServiceFilter(typeof(GlobalExceptionFilter))]
 [ServiceFilter(typeof(ModelStateFilter))]
-public class MenuRolesController : BaseController
+public class SubMenuController : BaseController
 {
-    private readonly IMenuRolesService _service;
-    private readonly IMapperService<MenuRoleDTO, DdMenuRole> _mapper;
-    public MenuRolesController(
-        IMenuRolesService service,
-        IMapperService<MenuRoleDTO, DdMenuRole> mapper
+    private readonly ISubMenuService _service;
+    private readonly IMapperService<SubMenuDTO, DdSubMenu> _mapper;
+    public SubMenuController(
+        ISubMenuService service,
+        IMapperService<SubMenuDTO, DdSubMenu> mapperService
         )
     {
         _service = service;
-        _mapper = mapper;
+        _mapper = mapperService;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllMenuRoles()
+    public async Task<IActionResult> GetAllSubMenus()
     {
         return await ExecuteAsync(async () =>
         {
@@ -42,38 +42,8 @@ public class MenuRolesController : BaseController
     }
 
     [HttpGet]
-    [Route("{roleId}")]
-    public async Task<IActionResult> GetAllMenuRolesById(string roleId)
-    {
-        return await ExecuteAsync(async () =>
-        {
-            var data = await _service.GetByRole(roleId).ToListAsync();
-
-            if (data.Any())
-                return CreateResponse("success", data, "success");
-
-            return CreateNotFoundResponse<object>(null, "Registers not founds");
-        });
-    }
-
-    [HttpGet]
-    [Route("GetMenuRoles")]
-    public async Task<IActionResult> GetMenuRoles()
-    {
-        return await ExecuteAsync(async () =>
-        {
-            var data = await _service.GetMenuRoles().ToListAsync();
-
-            if (data.Any())
-                return CreateResponse("success", data, "success");
-
-            return CreateNotFoundResponse<object>(null, "Registers not founds");
-        });
-    }
-
-    [HttpGet]
-    [Route("GetMenuById/{id}")]
-    public async Task<IActionResult> GetMenuById(int id)
+    [Route("{id}")]
+    public async Task<IActionResult> GetSubMenuById(int id)
     {
         return await ExecuteAsync(async () =>
         {
@@ -86,10 +56,25 @@ public class MenuRolesController : BaseController
         });
     }
 
-    [HttpPost]
-    public async Task<IActionResult> CreateMenu([FromForm] string dto)
+    [HttpGet]
+    [Route("GetSubMenuByMenuId/{id}")]
+    public async Task<IActionResult> GetSubMenuByMenuId(int menuId)
     {
-        return await HandleClientOperationAsync<MenuRoleDTO>(dto, null, async (model) =>
+        return await ExecuteAsync(async () =>
+        {
+            var data = await _service.GetByMenuIdAsync(menuId).ToListAsync();
+
+            if (data.Any())
+                return CreateResponse("success", data, "success");
+
+            return CreateNotFoundResponse<object>(null, "Registers not founds");
+        });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateSubMenu([FromForm] string dto)
+    {
+        return await HandleClientOperationAsync<SubMenuDTO>(dto, null, async (model) =>
         {
             var entity = _mapper.MapToDestination(model);
             var savedEntity = await _service.Create(entity);
@@ -99,13 +84,13 @@ public class MenuRolesController : BaseController
 
     [HttpPut]
     [Route("{id}")]
-    public async Task<IActionResult> UpdateMenu(int id, [FromForm] string dto)
+    public async Task<IActionResult> UpdateSubMenu(int id, [FromForm] string dto)
     {
         var existing = await _service.GetByIdAsync(id);
         if (existing == null)
             return NotFound("Register not found");
 
-        return await HandleClientOperationAsync<MenuRoleDTO>(dto, null, async (model) =>
+        return await HandleClientOperationAsync<SubMenuDTO>(dto, null, async (model) =>
         {
             await _service.Update(id, model);
             return NoContent();
@@ -114,7 +99,7 @@ public class MenuRolesController : BaseController
 
     [HttpDelete]
     [Route("{id}")]
-    public async Task<IActionResult> DeleteMenu(int id)
+    public async Task<IActionResult> DeleteSubMenu(int id)
     {
         try
         {
