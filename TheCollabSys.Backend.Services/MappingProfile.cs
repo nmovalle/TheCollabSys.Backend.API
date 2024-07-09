@@ -43,5 +43,14 @@ public class MappingProfile : Profile
         CreateMap<SkillSubcategoryDTO, DdSkillSubcategory>();
         CreateMap<DdSkillSubcategory, SkillSubcategoryDTO>();
 
+        CreateMap<MenuDTO, DdMenu>();
+        CreateMap<DdMenu, MenuDTO>();
+
+        CreateMap<SubMenuDTO, DdSubMenu>();
+        CreateMap<DdSubMenu, SubMenuDTO>();
+
+        CreateMap<MenuRoleDTO, DdMenuRole>();
+        CreateMap<DdMenuRole, MenuRoleDTO>();
+
     }
 }
