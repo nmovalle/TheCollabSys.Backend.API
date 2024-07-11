@@ -3,7 +3,8 @@ using TheCollabSys.Backend.Entity.Models;
 
 namespace TheCollabSys.Backend.Data.Interfaces;
 
-public interface ITokenRepository : IRepository<Token>
+public interface ITokenRepository : IRepository<AspNetUserToken>
 {
-    Task<Token?> GetTokenFirsOrDefaultAsync(string refreshToken);
+    Task<AspNetUserToken?> GetTokenFirsOrDefaultAsync(string refreshToken);
+    Task<AspNetUserToken?> GetTokenByUser(string userId);
 }

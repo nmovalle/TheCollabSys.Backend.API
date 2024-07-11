@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Azure.Core;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +10,7 @@ using TheCollabSys.Backend.API.Token;
 using TheCollabSys.Backend.Entity.Auth;
 using TheCollabSys.Backend.Entity.DTOs;
 using TheCollabSys.Backend.Entity.Models;
+using TheCollabSys.Backend.Entity.Request;
 using TheCollabSys.Backend.Entity.Response;
 using TheCollabSys.Backend.Services;
 
@@ -175,9 +178,36 @@ namespace TheCollabSys.Backend.API.Controllers
         #endregion
 
         #region Token
+        //[AllowAnonymous]
+        //[HttpPost]
+        //[Route("token")]
+        //public async Task<IActionResult> GenerateToken(AuthenticationRequestBody authenticationRequestBody)
+        //{
+        //    var user = await GetUser(authenticationRequestBody.username);
+        //    var userRole = await GetUserRole(user.UserName);
+        //    var token = await GenerateToken(user.UserName);
+
+        //    return Ok(new LoginResponse { UserRole = userRole, AuthToken = token });
+        //}
+
+        //[AllowAnonymous]
+        //[HttpPost]
+        //[Route("refreshToken")]
+        //public async Task<IActionResult> GenerateRefreshToken(AuhenticationRefreshRequestBody auhenticationRefreshRequestBody)
+        //{
+        //    var user = await GetUser(auhenticationRefreshRequestBody.username);
+        //    var userRole = await GetUserRole(user.UserName);
+        //    var token = await GenerateRefreshToken(auhenticationRefreshRequestBody.refreshToken);
+
+        //    return Ok(new LoginResponse { UserRole = userRole, AuthToken = token });
+        //}
         private async Task<AuthTokenResponse> GenerateToken(string username) 
         {
             return await _jwtTokenGenerator.GenerateToken(username);
+        }
+        private async Task<AuthTokenResponse> GenerateRefreshToken(string refreshToken)
+        {
+            return await _jwtTokenGenerator.RefreshToken(refreshToken);
         }
 
         #endregion
