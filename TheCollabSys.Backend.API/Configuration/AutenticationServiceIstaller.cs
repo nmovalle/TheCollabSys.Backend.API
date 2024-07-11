@@ -1,47 +1,46 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using TheCollabSys.Backend.API.Token;
 
 namespace TheCollabSys.Backend.API.Configuration;
 
-public class AutenticationServiceIstaller : IServiceInstaller
+public class AuthenticationServiceInstaller : IServiceInstaller
 {
     public void Install(IServiceCollection services, IConfiguration configuration)
     {
-        // Configuración de autenticación
+        var jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>();
+
         services.AddAuthentication(options =>
         {
-            // Esquema de autenticación predeterminado para cookies
-            options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            // Esquema predeterminado para iniciar sesión
-            options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            // Esquema predeterminado para el desafío de autenticación
-            options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         })
-        .AddCookie() // Agrega autenticación basada en cookies
         .AddJwtBearer(options =>
         {
-            // Configuración JWT Bearer
-            options.TokenValidationParameters.ValidateIssuer = true;
-            options.TokenValidationParameters.ValidateAudience = true;
-            options.TokenValidationParameters.ValidateIssuerSigningKey = true;
-            options.TokenValidationParameters.ValidateLifetime = true;
-            options.TokenValidationParameters.RequireExpirationTime = true;
-            options.TokenValidationParameters.ValidIssuer = configuration["Jwt:Issuer"];
-            options.TokenValidationParameters.ValidAudience = configuration["Jwt:Audience"];
-            options.TokenValidationParameters.IssuerSigningKey =
-                new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["Jwt:SecretKey"]));
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateIssuerSigningKey = true,
+                ValidateLifetime = true,
+                RequireExpirationTime = true,
+                ValidIssuer = jwtSettings.Issuer,
+                ValidAudience = jwtSettings.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.SecretKey)),
+                ClockSkew = TimeSpan.Zero // Elimina el tiempo de gracia por defecto (5 minutos)
+            };
         })
-        .AddGoogle(googleOptions => // Agrega autenticación de Google
+        .AddCookie()
+        .AddGoogle(googleOptions =>
         {
             googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
             googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
             googleOptions.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             googleOptions.Events = new OAuthEvents
             {
-                // Personaliza los eventos si es necesario
             };
         });
     }

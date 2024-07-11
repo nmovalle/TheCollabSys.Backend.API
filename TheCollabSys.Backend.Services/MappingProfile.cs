@@ -52,5 +52,8 @@ public class MappingProfile : Profile
         CreateMap<MenuRoleDTO, DdMenuRole>();
         CreateMap<DdMenuRole, MenuRoleDTO>();
 
+        CreateMap<AspNetUserTokensDTO, AspNetUserToken>();
+        CreateMap<AspNetUserToken, AspNetUserTokensDTO>();
+
     }
 }

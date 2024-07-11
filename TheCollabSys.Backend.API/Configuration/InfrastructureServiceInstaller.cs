@@ -10,6 +10,7 @@ public class InfrastructureServiceInstaller : IServiceInstaller
     public void Install(IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<ITokenService, TokenService>();
 
         services.AddScoped<IDomainService, DomainService>();
         services.AddScoped<IUserService, UserService>();
