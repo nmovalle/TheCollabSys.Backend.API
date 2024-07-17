@@ -24,6 +24,7 @@ public class UnitOfWork : IUnitOfWork
     public IMenuRepository MenuRepository { get; private set; }
     public ISubMenuRepository SubMenuRepository { get; private set; }
     public IMenuRolesRepository MenuRolesRepository { get; private set; }
+    public IProjectAssignmentRepository ProjectAssignmentRepository { get; private set; }
 
 
     public UnitOfWork(TheCollabsysContext context)
@@ -48,6 +49,7 @@ public class UnitOfWork : IUnitOfWork
         MenuRepository = new MenuRepository(_context);
         SubMenuRepository = new SubMenuRepository(_context);
         MenuRolesRepository = new MenuRolesRepository(_context);
+        ProjectAssignmentRepository = new ProjectAssignmentRepository(_context);
     }
 
     public async Task<int> CompleteAsync()
