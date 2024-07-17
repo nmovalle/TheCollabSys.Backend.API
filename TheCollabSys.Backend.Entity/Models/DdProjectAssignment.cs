@@ -12,6 +12,7 @@ public partial class DdProjectAssignment
     public DateTime? EndDate { get; set; }
 
     public DateTime? DateCreated { get; set; }
+    public DateTime? UpdatedDate { get; set; }
 
     public virtual DdEngineer Engineer { get; set; } = null!;
 

@@ -43,6 +43,21 @@ public class EngineersController : BaseController
     }
 
     [HttpGet]
+    [Route("GetEngineersByProjectSkills/{projectId}")]
+    public async Task<IActionResult> GetEngineersByProjectSkills(int projectId)
+    {
+        return await ExecuteAsync(async () =>
+        {
+            var data = await _service.GetEngineersByProjectSkillsAsync(projectId).ToListAsync();
+
+            if (data == null)
+                return CreateNotFoundResponse<object>(null, "register not found");
+
+            return CreateResponse("success", data, "success");
+        });
+    }
+
+    [HttpGet]
     [Route("{id}")]
     public async Task<IActionResult> GetEngineerById(int id)
     {

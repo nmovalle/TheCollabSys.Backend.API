@@ -20,6 +20,7 @@ public interface IUnitOfWork : IDisposable
     IMenuRepository MenuRepository { get; }
     ISubMenuRepository SubMenuRepository { get; }
     IMenuRolesRepository MenuRolesRepository { get; }
+    IProjectAssignmentRepository ProjectAssignmentRepository { get; }
 
     Task<int> CompleteAsync();
 }

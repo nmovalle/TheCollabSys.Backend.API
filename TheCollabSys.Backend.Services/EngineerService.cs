@@ -43,6 +43,44 @@ public class EngineerService : IEngineerService
         return data;
     }
 
+    public IAsyncEnumerable<EngineerDTO> GetEngineersByProjectSkillsAsync(int projectId)
+    {
+        var data = _unitOfWork.EngineerRepository.GetAllQueryable()
+            .Join(_unitOfWork.EngineerSkillRepository.GetAllQueryable(),
+                  engineer => engineer.EngineerId,
+                  engineerSkill => engineerSkill.EngineerId,
+                  (engineer, engineerSkill) => new { engineer, engineerSkill })
+            .Join(_unitOfWork.ProjectSkillRepository.GetAllQueryable(),
+                  combined => combined.engineerSkill.SkillId,
+                  projectSkill => projectSkill.SkillId,
+                  (combined, projectSkill) => new { combined.engineer, combined.engineerSkill, projectSkill })
+            .Join(_unitOfWork.ProjectRepository.GetAllQueryable(),
+                  combined => combined.projectSkill.ProjectId,
+                  project => project.ProjectId,
+                  (combined, project) => new { combined.engineer, project })
+            .Where(result => result.project.ProjectId == projectId)
+            .Select(result => new EngineerDTO
+            {
+                EngineerId = result.engineer.EngineerId,
+                EngineerName = result.engineer.EngineerName,
+                EmployerId = result.engineer.EmployerId,
+                EmployerName = result.engineer.Employer.EmployerName,
+                FirstName = result.engineer.FirstName,
+                LastName = result.engineer.LastName,
+                Email = result.engineer.Email,
+                Phone = result.engineer.Phone,
+                Image = result.engineer.Image,
+                DateCreated = result.engineer.DateCreated,
+                IsActive = result.engineer.IsActive,
+                UserId = result.engineer.UserId,
+                DateUpdate = result.engineer.DateUpdate,
+                Filetype = result.engineer.Filetype
+            })
+            .AsAsyncEnumerable();
+
+        return data;
+    }
+
     public async Task<EngineerDTO?> GetByIdAsync(int id)
     {
         var resp = await _unitOfWork.EngineerRepository.GetAllQueryable()
