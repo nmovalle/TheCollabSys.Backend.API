@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 using TheCollabSys.Backend.Data;
 using TheCollabSys.Backend.Data.Interfaces;
 using TheCollabSys.Backend.Entity.DTOs;
@@ -45,11 +46,13 @@ public class EngineerSkillService : IEngineerSkillService
                     join p in _unitOfWork.EngineerRepository.GetAllQueryable() on ps.EngineerId equals p.EngineerId
                     join s in _unitOfWork.SkillRepository.GetAllQueryable() on ps.SkillId equals s.SkillId
                     where ps.EngineerId == id
-                    group new { ps, p, s } by new { ps.EngineerId, p.EngineerName } into grouped
+                    group new { ps, p, s } by new { ps.EngineerId, p.EngineerName, p.FirstName, p.LastName } into grouped
                     select new EngineerSkillDetailDTO
                     {
                         EngineerId = grouped.Key.EngineerId,
                         EngineerName = grouped.Key.EngineerName,
+                        FirstName = grouped.Key.FirstName,
+                        LastName = grouped.Key.LastName,
                         Skills = grouped.Select(g => new SkillLevelDTO
                         {
                             SkillId = g.s.SkillId,

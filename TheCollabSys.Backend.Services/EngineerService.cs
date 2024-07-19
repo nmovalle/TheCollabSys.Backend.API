@@ -74,7 +74,10 @@ public class EngineerService : IEngineerService
                 IsActive = result.engineer.IsActive,
                 UserId = result.engineer.UserId,
                 DateUpdate = result.engineer.DateUpdate,
-                Filetype = result.engineer.Filetype
+                Filetype = result.engineer.Filetype,
+                Rating = _unitOfWork.EngineerSkillRepository.GetAllQueryable()
+                        .Where(es => es.EngineerId == result.engineer.EngineerId)
+                        .Average(es => (double?)es.LevelId) ?? 0
             })
             .AsAsyncEnumerable();
 

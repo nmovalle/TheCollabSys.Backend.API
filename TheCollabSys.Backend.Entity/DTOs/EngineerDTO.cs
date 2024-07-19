@@ -28,4 +28,5 @@ public class EngineerDTO
     public DateTime? DateUpdate { get; set; }
 
     public string? Filetype { get; set; }
+    public double? Rating { get; set; }
 }
