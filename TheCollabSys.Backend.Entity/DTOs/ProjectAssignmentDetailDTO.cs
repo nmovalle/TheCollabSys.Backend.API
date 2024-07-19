@@ -16,7 +16,7 @@ public class Assignments
     public string? Email { get; set; }
     public string? Phone { get; set; }
     public byte[]? Image { get; set; }
-    public int Rating { get; set; }
+    public double Rating { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public DateTime? DateCreated { get; set; }

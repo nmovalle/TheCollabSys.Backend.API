@@ -32,7 +32,9 @@ public class ProjectAssignmentService : IProjectAssignmentService
                             Email = g.e.Email,
                             Phone = g.e.Phone,
                             Image = g.e.Image,
-                            Rating = 5, //pendiente relación con DD_EngineerRatings
+                            Rating = _unitOfWork.EngineerSkillRepository.GetAllQueryable()
+                                         .Where(es => es.EngineerId == g.e.EngineerId)
+                                         .Average(es => es.LevelId),
                             StartDate = g.pa.StartDate,
                             EndDate = g.pa.EndDate,
                             DateCreated = g.pa.DateCreated,
@@ -63,7 +65,9 @@ public class ProjectAssignmentService : IProjectAssignmentService
                             Email = g.e.Email,
                             Phone = g.e.Phone,
                             Image = g.e.Image,
-                            Rating = 5, //pendiente relación con DD_EngineerRatings
+                            Rating = _unitOfWork.EngineerSkillRepository.GetAllQueryable()
+                                         .Where(es => es.EngineerId == g.e.EngineerId)
+                                         .Average(es => es.LevelId),
                             StartDate = g.pa.StartDate,
                             EndDate = g.pa.EndDate,
                             DateCreated = g.pa.DateCreated,
