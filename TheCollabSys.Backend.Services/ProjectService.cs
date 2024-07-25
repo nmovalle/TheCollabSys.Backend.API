@@ -3,6 +3,7 @@ using TheCollabSys.Backend.Data;
 using TheCollabSys.Backend.Entity.DTOs;
 using TheCollabSys.Backend.Entity.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Dynamic;
 
 namespace TheCollabSys.Backend.Services;
 
@@ -110,5 +111,70 @@ public class ProjectService : IProjectService
 
         _unitOfWork.ProjectRepository.Remove(entity);
         await _unitOfWork.CompleteAsync();
+    }
+
+    private async Task<IEnumerable<dynamic>> ExecuteStoredProcedure(string storedProcedureName)
+    {
+        using var command = _context.Database.GetDbConnection().CreateCommand();
+        command.CommandText = $"EXEC {storedProcedureName}";
+        await _context.Database.OpenConnectionAsync();
+        using var result = await command.ExecuteReaderAsync();
+        var dynamicResults = new List<dynamic>();
+        while (await result.ReadAsync())
+        {
+            dynamic dynamicResult = new ExpandoObject();
+            var rowDict = (IDictionary<string, object>)dynamicResult;
+            for (int i = 0; i < result.FieldCount; i++)
+            {
+                rowDict[result.GetName(i)] = result.GetValue(i);
+            }
+
+            dynamicResults.Add(dynamicResult);
+        }
+
+        return dynamicResults;
+    }
+
+    public async Task<IEnumerable<dynamic>> GetSpGetOverviewProjects()
+    {
+        return await ExecuteStoredProcedure("SpGetOverviewProjects");
+    }
+
+    public async Task<IEnumerable<dynamic>> GetSpGetOnComingProjects()
+    {
+        return await ExecuteStoredProcedure("SpGetOnComingProjects");
+    }
+
+    public async Task<IEnumerable<dynamic>> GetSpGetProjectsPendingResources()
+    {
+        return await ExecuteStoredProcedure("SpGetProjectsPendingResources");
+    }
+
+    public async Task<IEnumerable<dynamic>> GetSpGetOpenProjects()
+    {
+        return await ExecuteStoredProcedure("SpGetOpenProjects");
+    }
+
+    public async Task<IEnumerable<dynamic>> GetSpGetPendingProjects()
+    {
+        return await ExecuteStoredProcedure("SpGetPendingProjects");
+    }
+
+    public async Task<dynamic> GetKPIs()
+    {
+        var overViewProjects = await this.GetSpGetOverviewProjects();
+        var oncomingProjects = await this.GetSpGetOnComingProjects();
+        var pendingResourcesProjects = await this.GetSpGetProjectsPendingResources();
+        var openProjects = await this.GetSpGetOpenProjects();
+        var pendingProjects = await this.GetSpGetPendingProjects();
+
+        dynamic kpis = new ExpandoObject();
+        kpis.overViewProjects = overViewProjects.FirstOrDefault();
+        kpis.oncomingProjects = oncomingProjects.FirstOrDefault();
+        kpis.pendingResourcesProjects = pendingResourcesProjects.FirstOrDefault();
+        kpis.openProjects = openProjects;
+        kpis.pendingProjects = pendingProjects;
+
+        return kpis;
     }
 }

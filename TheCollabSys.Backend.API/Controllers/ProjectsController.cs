@@ -57,6 +57,21 @@ public class ProjectsController : BaseController
         });
     }
 
+    [HttpGet]
+    [Route("kpis")]
+    public async Task<IActionResult> GetKPIs()
+    {
+        return await ExecuteAsync(async () =>
+        {
+            var data = await _service.GetKPIs();
+
+            if (data != null)
+                return CreateResponse("success", data, "success");
+
+            return CreateNotFoundResponse<object>(null, "Registers not founds");
+        });
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateProject([FromForm] string dto, [FromForm] IFormFile? file)
     {

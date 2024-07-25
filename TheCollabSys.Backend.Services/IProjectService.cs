@@ -11,4 +11,5 @@ public interface IProjectService
     Task<DdProject> Create(DdProject entity);
     Task Update(int id, ProjectDTO dto);
     Task Delete(int id);
+    Task<dynamic> GetKPIs();
 }
