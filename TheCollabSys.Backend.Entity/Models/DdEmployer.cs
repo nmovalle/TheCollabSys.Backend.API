@@ -11,11 +11,17 @@ public partial class DdEmployer
 
     public DateTime? DateCreated { get; set; }
 
-    public byte[]? Image { get; init; }
+    public byte[]? Image { get; set; }
+
+    public string? UserId { get; set; }
+
     public string? Filetype { get; set; }
-    public DateTime? DateUpdate { get; set; }
+
     public bool? Active { get; set; }
-    public string? UserId { get; init; }
+
+    public DateTime? DateUpdate { get; set; }
+
+    public virtual ICollection<DdEmployerProjectAssignment> DdEmployerProjectAssignments { get; set; } = new List<DdEmployerProjectAssignment>();
 
     public virtual ICollection<DdEngineer> DdEngineers { get; set; } = new List<DdEngineer>();
 

@@ -39,6 +39,8 @@ public partial class TheCollabsysContext : DbContext
 
     public virtual DbSet<DdEmployer> DD_Employers { get; set; }
 
+    public virtual DbSet<DdEmployerProjectAssignment> DD_EmployerProjectAssignments { get; set; }
+
     public virtual DbSet<DdEngineer> DD_Engineers { get; set; }
 
     public virtual DbSet<DdEngineerActivity> DdEngineerActivities { get; set; }
@@ -257,12 +259,28 @@ public partial class TheCollabsysContext : DbContext
 
             entity.Property(e => e.Address).HasMaxLength(255);
             entity.Property(e => e.EmployerName).HasMaxLength(255);
+            entity.Property(e => e.Filetype)
+                .HasMaxLength(50)
+                .IsUnicode(false);
             entity.Property(e => e.Phone).HasMaxLength(50);
             entity.Property(e => e.UserId)
                 .HasMaxLength(450);
 
             entity.HasOne(d => d.User).WithMany(p => p.DdEmployers)
                 .HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<DdEmployerProjectAssignment>(entity =>
+        {
+            entity.HasKey(e => e.AssignmentId);
+
+            entity.HasOne(d => d.Employer).WithMany(p => p.DdEmployerProjectAssignments)
+                .HasForeignKey(d => d.EmployerId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            entity.HasOne(d => d.Project).WithMany(p => p.DdEmployerProjectAssignments)
+                .HasForeignKey(d => d.ProjectId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<DdEngineer>(entity =>
@@ -430,13 +448,10 @@ public partial class TheCollabsysContext : DbContext
         modelBuilder.Entity<DdProject>(entity =>
         {
             entity.HasKey(e => e.ProjectId);
-
+        
             entity.Property(e => e.ProjectName).HasMaxLength(255);
-
-
-            entity.HasOne(d => d.Client).WithMany(p => p.DdProjects)
-                .HasForeignKey(d => d.ClientId)
-                .OnDelete(DeleteBehavior.ClientSetNull);
+             entity.Property(e => e.UserId)
+                .HasMaxLength(450);
 
             entity.HasOne(d => d.Status).WithMany(p => p.DdProjects)
                 .HasForeignKey(d => d.StatusId)

@@ -33,6 +33,7 @@ public class InfrastructureServiceInstaller : IServiceInstaller
         services.AddScoped<IMenuRolesService, MenuRolesService>();
 
         services.AddScoped<IProjectAssignmentService, ProjectAssignmentService>();
+        services.AddScoped<IEmployerProjectAssignmentService, EmployerProjectAssignmentService>();
 
 
         services.AddScoped(typeof(IMapperService<,>), typeof(MapperService<,>));

@@ -18,12 +18,14 @@ public partial class DdProject
     public DateTime? EndDate { get; set; }
 
     public int StatusId { get; set; }
+
     public string? UserId { get; set; }
+
     public DateTime? DateUpdate { get; set; }
 
-    public virtual DdClient Client { get; set; } = null!;
-
     public virtual ICollection<DdAssignmentHistory> DdAssignmentHistories { get; set; } = new List<DdAssignmentHistory>();
+
+    public virtual ICollection<DdEmployerProjectAssignment> DdEmployerProjectAssignments { get; set; } = new List<DdEmployerProjectAssignment>();
 
     public virtual ICollection<DdEngineerActivity> DdEngineerActivities { get; set; } = new List<DdEngineerActivity>();
 
