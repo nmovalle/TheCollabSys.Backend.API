@@ -23,6 +23,8 @@ public partial class DdProject
 
     public DateTime? DateUpdate { get; set; }
 
+    public virtual DdClient Client { get; set; } = null!;
+
     public virtual ICollection<DdAssignmentHistory> DdAssignmentHistories { get; set; } = new List<DdAssignmentHistory>();
 
     public virtual ICollection<DdEmployerProjectAssignment> DdEmployerProjectAssignments { get; set; } = new List<DdEmployerProjectAssignment>();
@@ -40,4 +42,6 @@ public partial class DdProject
     public virtual ICollection<DdProjectSoftware> DdProjectSoftwares { get; set; } = new List<DdProjectSoftware>();
 
     public virtual DdProjectStatus Status { get; set; } = null!;
+
+    public virtual AspNetUser? User { get; set; }
 }
