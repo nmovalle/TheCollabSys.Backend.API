@@ -448,14 +448,29 @@ public partial class TheCollabsysContext : DbContext
         modelBuilder.Entity<DdProject>(entity =>
         {
             entity.HasKey(e => e.ProjectId);
-        
+
+            entity.Property(e => e.ProjectId);
+            entity.Property(e => e.ClientId);
+            entity.Property(e => e.DateCreated);
+            entity.Property(e => e.DateUpdate);
+            entity.Property(e => e.EndDate);
+            entity.Property(e => e.ProjectDescription);
             entity.Property(e => e.ProjectName).HasMaxLength(255);
-             entity.Property(e => e.UserId)
+            entity.Property(e => e.StartDate);
+            entity.Property(e => e.StatusId);
+            entity.Property(e => e.UserId)
                 .HasMaxLength(450);
+
+            entity.HasOne(d => d.Client).WithMany(p => p.DdProjects)
+                .HasForeignKey(d => d.ClientId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Status).WithMany(p => p.DdProjects)
                 .HasForeignKey(d => d.StatusId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
+
+            entity.HasOne(d => d.User).WithMany(p => p.DdProjects)
+                .HasForeignKey(d => d.UserId);
         });
 
         modelBuilder.Entity<DdProjectAssignment>(entity =>

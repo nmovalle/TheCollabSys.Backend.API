@@ -45,6 +45,8 @@ public partial class AspNetUser
 
     public virtual ICollection<AspNetRole> Roles { get; set; } = new List<AspNetRole>();
 
+    public virtual ICollection<DdProject> DdProjects { get; set; } = new List<DdProject>();
+
     public virtual ICollection<AspNetUserRole> UserRoles { get; set; } = new List<AspNetUserRole>();
 
 }
