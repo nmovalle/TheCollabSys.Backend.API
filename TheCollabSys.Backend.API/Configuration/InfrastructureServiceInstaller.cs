@@ -35,6 +35,10 @@ public class InfrastructureServiceInstaller : IServiceInstaller
         services.AddScoped<IProjectAssignmentService, ProjectAssignmentService>();
         services.AddScoped<IEmployerProjectAssignmentService, EmployerProjectAssignmentService>();
 
+        services.AddScoped<IAccessCodeService, AccessCodeService>();
+        services.AddScoped<ICompanyService, CompanyService>();
+        services.AddScoped<IUserCompanyService, UserCompanyService>();
+        services.AddScoped<IEmailService, EmailService>();
 
         services.AddScoped(typeof(IMapperService<,>), typeof(MapperService<,>));
 

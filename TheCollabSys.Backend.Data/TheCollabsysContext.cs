@@ -23,6 +23,8 @@ public partial class TheCollabsysContext : DbContext
 
     public virtual DbSet<AspNetUserRole> AspNetUserRoles { get; set; }
 
+    public virtual DbSet<DdAccessCode> DD_AccessCode { get; set; }
+
     public virtual DbSet<DdActivity> DdActivities { get; set; }
 
     public virtual DbSet<DdAssignmentHistory> DdAssignmentHistories { get; set; }
@@ -34,6 +36,8 @@ public partial class TheCollabsysContext : DbContext
     public virtual DbSet<DdClient> DD_Clients { get; set; }
 
     public virtual DbSet<DdClientRating> DdClientRatings { get; set; }
+
+    public virtual DbSet<DdCompany> DD_Companies { get; set; }
 
     public virtual DbSet<DdDomainMaster> DD_DomainMaster { get; set; }
 
@@ -101,6 +105,8 @@ public partial class TheCollabsysContext : DbContext
 
     public virtual DbSet<DdMenuRole> DD_MenuRoles { get; set; }
 
+    public virtual DbSet<DdUserCompany> DD_UserCompanies { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AspNetRole>(entity =>
@@ -153,6 +159,20 @@ public partial class TheCollabsysContext : DbContext
             entity.Property(e => e.Name).HasMaxLength(128);
 
             entity.HasOne(d => d.User).WithMany(p => p.AspNetUserTokens).HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<DdAccessCode>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever();
+            entity.Property(e => e.Email)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.ExpAt);
+            entity.Property(e => e.RegAt);
+            entity.Property(e => e.AccessCode).HasMaxLength(10);
         });
 
         modelBuilder.Entity<AspNetRole>(entity =>
@@ -243,6 +263,23 @@ public partial class TheCollabsysContext : DbContext
             entity.HasOne(d => d.Engineer).WithMany(p => p.DdClientRatings)
                 .HasForeignKey(d => d.EngineerId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
+        });
+
+        modelBuilder.Entity<DdCompany>(entity =>
+        {
+            entity.HasKey(e => e.CompanyId);
+
+            entity.Property(e => e.Address)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.FileType)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.FullName)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.Phone)
+                .HasMaxLength(10);
         });
 
         modelBuilder.Entity<DdDomainMaster>(entity =>
@@ -680,6 +717,18 @@ public partial class TheCollabsysContext : DbContext
 
             entity.HasOne(d => d.Menu).WithMany(p => p.DdSubMenus)
                 .HasForeignKey(d => d.MenuId);
+        });
+
+        modelBuilder.Entity<DdUserCompany>(entity =>
+        {
+            entity.HasKey(e => e.UserCompayId);
+
+            entity.Property(e => e.UserCompayId);
+            entity.Property(e => e.UserId)
+                .HasMaxLength(450);
+
+            entity.HasOne(d => d.User).WithMany(p => p.DdUserCompanies)
+                .HasForeignKey(d => d.UserId);
         });
 
         base.OnModelCreating(modelBuilder);
