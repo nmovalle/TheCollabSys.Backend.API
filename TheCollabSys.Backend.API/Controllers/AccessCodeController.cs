@@ -19,15 +19,18 @@ namespace TheCollabSys.Backend.API.Controllers;
 public class AccessCodeController : BaseController
 {
     private readonly IAccessCodeService _service;
+    private readonly IConfiguration _configuration;
     private readonly IEmailService _emailService;
     private readonly IMapperService<AccessCodeDTO, DdAccessCode> _mapper;
     public AccessCodeController(
         IAccessCodeService service,
+        IConfiguration configuration,
         IEmailService emailService,
         IMapperService<AccessCodeDTO, DdAccessCode> mapperService
         )
     {
         _service = service;
+        _configuration = configuration;
         _emailService = emailService;
         _mapper = mapperService;
     }
@@ -128,15 +131,17 @@ public class AccessCodeController : BaseController
                 return CreateNotFoundResponse<object>(null, $"There is already a valid access code for {emailInput.Email}");
 
             // Generar un código de acceso de 6 dígitos aleatorios
+            int expireMinutes = _configuration.GetValue<int>("AccessCode:ExpireMinutes");
             var random = new Random();
             var accessCode = random.Next(100000, 999999).ToString();
+            var currentTime = DateTime.UtcNow;
 
             var ddAccessCode = new DdAccessCode
             {
                 Email = emailInput.Email,
                 AccessCode = accessCode,
                 RegAt = DateTime.UtcNow,
-                ExpAt = DateTime.UtcNow.AddHours(1)
+                ExpAt = currentTime.AddMinutes(expireMinutes)
             };
 
             var savedEntity = await _service.Create(ddAccessCode);
@@ -160,6 +165,7 @@ public class AccessCodeController : BaseController
             var existingAccessCode = await _service.GetByEmail(emailInput.Email);
 
             // Generar un nuevo código de acceso de 6 dígitos aleatorios
+            int expireMinutes = _configuration.GetValue<int>("AccessCode:ExpireMinutes");
             var random = new Random();
             var newAccessCode = random.Next(100000, 999999).ToString();
             var currentTime = DateTime.UtcNow;
@@ -169,7 +175,7 @@ public class AccessCodeController : BaseController
                 // Actualizar el código de acceso y extender su tiempo de expiración
                 existingAccessCode.AccessCode = newAccessCode;
                 existingAccessCode.RegAt = currentTime;
-                existingAccessCode.ExpAt = currentTime.AddHours(1);
+                existingAccessCode.ExpAt = currentTime.AddMinutes(expireMinutes);
                 existingAccessCode.IsValid = false;
 
                 await _service.Update(existingAccessCode.Id, existingAccessCode);
@@ -189,7 +195,7 @@ public class AccessCodeController : BaseController
                     Email = emailInput.Email,
                     AccessCode = newAccessCode,
                     RegAt = currentTime,
-                    ExpAt = currentTime.AddHours(1),
+                    ExpAt = currentTime.AddMinutes(expireMinutes),
                     IsValid = false
                 };
 
@@ -216,10 +222,10 @@ public class AccessCodeController : BaseController
             var accessCode = await _service.GetByAccessCodeEmail(emailInput.Code, emailInput.Email);
 
             if (accessCode == null || accessCode.ExpAt < DateTime.UtcNow)
-                return CreateBadRequestResponse<object>(null, "Invalid or expired access code");
+                return NotFound(new { AccessCode = request.Code, Email = request.Email, Message = "Invalid or expired access code" });
 
             if ((bool)accessCode.IsValid)
-                return CreateBadRequestResponse<object>(null, "Access code has already been used");
+                return NotFound(new { AccessCode = request.Code, Email = request.Email, Message = "Access code has already been used" });
 
             accessCode.IsValid = true;
             await _service.Update(accessCode.Id, accessCode);

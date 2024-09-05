@@ -45,6 +45,21 @@ public class UserCompanyService : IUserCompanyService
         return resp;
     }
 
+    public async Task<UserCompanyDTO?> GetByUserIdAsync(string userid)
+    {
+        var resp = await _unitOfWork.UserCompanyRepository.GetAllQueryable()
+            .Where(c => c.UserId == userid)
+            .Select(c => new UserCompanyDTO
+            {
+                UserCompayId = c.UserCompayId,
+                UserId = c.UserId,
+                CompanyId = c.CompanyId
+            })
+            .FirstOrDefaultAsync();
+
+        return resp;
+    }
+
     public async Task<DdUserCompany> Create(DdUserCompany entity)
     {
         _unitOfWork.UserCompanyRepository.Add(entity);

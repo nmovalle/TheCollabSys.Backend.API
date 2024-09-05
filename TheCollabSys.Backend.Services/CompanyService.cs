@@ -1,4 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic.FileIO;
+using System;
+using System.ComponentModel.Design;
+using System.Text.RegularExpressions;
 using TheCollabSys.Backend.Data.Interfaces;
 using TheCollabSys.Backend.Entity.DTOs;
 using TheCollabSys.Backend.Entity.Models;
@@ -53,6 +57,27 @@ public class CompanyService : ICompanyService
                 Active = c.Active
             })
             .FirstOrDefaultAsync();
+
+        return resp;
+    }
+
+    public Task<CompanyDTO?> GetByIdDomainAsync(string domain)
+    {
+        var resp = (
+                from dm in _unitOfWork.DomainRepository.GetAllQueryable()
+                join c in _unitOfWork.CompanyRepository.GetAllQueryable() on dm.Id equals c.DomainmasterId
+                where dm.Domain == domain
+                group new { dm, c } by new { c.CompanyId, c.DomainmasterId, c.FullName, c.Logo, c.FileType, c.Active } into grouped
+                select new CompanyDTO
+                {
+                    CompanyId = grouped.Key.CompanyId,
+                    DomainmasterId = grouped.Key.DomainmasterId,
+                    FullName = grouped.Key.FullName,
+                    Logo = grouped.Key.Logo,
+                    FileType = grouped.Key.FileType,
+                    Active = grouped.Key.Active
+
+                }).FirstOrDefaultAsync();
 
         return resp;
     }

@@ -8,6 +8,12 @@ public class UserCreationModel
     // Puedes agregar otras propiedades si es necesario
 }
 
+public class UserWithoutPassModel
+{
+    public string UserName { get; set; }
+    public string Email { get; set; }
+}
+
 public class LoginModel
 {
     public string UserName { get; set; }

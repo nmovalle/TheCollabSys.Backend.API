@@ -64,5 +64,13 @@ public class MappingProfile : Profile
         CreateMap<UserCompanyDTO, DdUserCompany>();
         CreateMap<DdUserCompany, UserCompanyDTO>();
 
+        CreateMap<DomainMasterDTO, DdDomainMaster>();
+        CreateMap<DdDomainMaster, DomainMasterDTO>();
+
+        CreateMap<InvitationDTO, DdInvitation>();
+        CreateMap<DdInvitation, InvitationDTO>();
+
+        CreateMap<WireListDTO, DdWireList>();
+        CreateMap<DdWireList, WireListDTO>();
     }
 }

@@ -1,11 +1,12 @@
-﻿using TheCollabSys.Backend.Entity.Models;
+﻿using TheCollabSys.Backend.Entity.DTOs;
+using TheCollabSys.Backend.Entity.Models;
 
 namespace TheCollabSys.Backend.Services;
 
 public interface IDomainService
 {
-    Task<DdDomainMaster> AddDomainMaster(DdDomainMaster domainMaster);
-    Task<IEnumerable<DdDomainMaster>> GetAllDomainMastersAsync();
-    Task<DdDomainMaster?> GetDomainMasterById(int id);
-    Task<DdDomainMaster?> GetDomainMasterByDomain(string domain);
+    IAsyncEnumerable<DomainMasterDTO> GetAll();
+    Task<DomainMasterDTO?> GetByIdAsync(int id);
+    Task<DomainMasterDTO?> GetByDomainAsync(string domain);
+    Task<DdDomainMaster> Create(DdDomainMaster entity);
 }

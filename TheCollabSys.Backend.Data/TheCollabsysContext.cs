@@ -61,6 +61,8 @@ public partial class TheCollabsysContext : DbContext
 
     public virtual DbSet<DdEquipment> DdEquipments { get; set; }
 
+    public virtual DbSet<DdInvitation> DD_Invitations { get; set; }
+
     public virtual DbSet<DdLevelMaster> DdLevelMasters { get; set; }
 
     public virtual DbSet<DdProfile> DdProfiles { get; set; }
@@ -106,6 +108,8 @@ public partial class TheCollabsysContext : DbContext
     public virtual DbSet<DdMenuRole> DD_MenuRoles { get; set; }
 
     public virtual DbSet<DdUserCompany> DD_UserCompanies { get; set; }
+
+    public virtual DbSet<DdWireList> DD_WireList { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -166,7 +170,8 @@ public partial class TheCollabsysContext : DbContext
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Id)
-                .ValueGeneratedNever();
+                .ValueGeneratedOnAdd();
+
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
                 .IsUnicode(false);
@@ -387,6 +392,14 @@ public partial class TheCollabsysContext : DbContext
             entity.HasOne(d => d.Level).WithMany(p => p.DdEngineerEquipments)
                 .HasForeignKey(d => d.LevelId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
+        });
+
+        modelBuilder.Entity<DdInvitation>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Email).HasMaxLength(256);
+            entity.Property(e => e.ExpirationDate);
         });
 
         modelBuilder.Entity<DdEngineerRating>(entity =>
@@ -729,6 +742,14 @@ public partial class TheCollabsysContext : DbContext
 
             entity.HasOne(d => d.User).WithMany(p => p.DdUserCompanies)
                 .HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<DdWireList>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Domain).HasMaxLength(256);
+            entity.Property(e => e.Email).HasMaxLength(256);
         });
 
         base.OnModelCreating(modelBuilder);

@@ -40,6 +40,10 @@ public class InfrastructureServiceInstaller : IServiceInstaller
         services.AddScoped<IUserCompanyService, UserCompanyService>();
         services.AddScoped<IEmailService, EmailService>();
 
+        services.AddScoped<IInvitationService, InvitationService>();
+        services.AddScoped<IWireListService, WireListService>();
+
+
         services.AddScoped(typeof(IMapperService<,>), typeof(MapperService<,>));
 
         services.AddAutoMapper(typeof(Program));

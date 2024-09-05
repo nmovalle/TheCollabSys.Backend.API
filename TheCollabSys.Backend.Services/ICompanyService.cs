@@ -7,6 +7,7 @@ public interface ICompanyService
 {
     IAsyncEnumerable<CompanyDTO> GetAll();
     Task<CompanyDTO?> GetByIdAsync(int id);
+    Task<CompanyDTO?> GetByIdDomainAsync(string domain);
     Task<DdCompany> Create(DdCompany entity);
     Task Update(int id, CompanyDTO dto);
     Task Delete(int id);

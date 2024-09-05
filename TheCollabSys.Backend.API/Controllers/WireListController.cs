@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TheCollabSys.Backend.API.Extensions;
 using TheCollabSys.Backend.API.Filters;
 using TheCollabSys.Backend.Entity.DTOs;
@@ -13,13 +12,13 @@ namespace TheCollabSys.Backend.API.Controllers;
 [Route("api/[controller]")]
 [ServiceFilter(typeof(GlobalExceptionFilter))]
 [ServiceFilter(typeof(ModelStateFilter))]
-public class UserCompanyController : BaseController
+public class WireListController : BaseController
 {
-    private readonly IUserCompanyService _service;
-    private readonly IMapperService<UserCompanyDTO, DdUserCompany> _mapper;
-    public UserCompanyController(
-        IUserCompanyService service,
-        IMapperService<UserCompanyDTO, DdUserCompany> mapperService
+    private readonly IWireListService _service;
+    private readonly IMapperService<WireListDTO, DdWireList> _mapper;
+    public WireListController(
+        IWireListService service,
+        IMapperService<WireListDTO, DdWireList> mapperService
         )
     {
         _service = service;
@@ -55,33 +54,15 @@ public class UserCompanyController : BaseController
         });
     }
 
-    [HttpGet]
-    [Route("GetByUserId/{userid}")]
-    public async Task<IActionResult> GetByUserIdAsync(string userid)
-    {
-        return await ExecuteAsync(async () =>
-        {
-            var data = await _service.GetByUserIdAsync(userid);
-
-            if (data == null)
-                return CreateNotFoundResponse<object>(null, "register not found");
-
-            return CreateResponse("success", data, "success");
-        });
-    }
-
     [HttpPost]
     public async Task<IActionResult> Create([FromForm] string dto)
     {
-        return await this.HandleClientOperationAsync<UserCompanyDTO>(dto, null, async (model) =>
+        return await this.HandleClientOperationAsync<WireListDTO>(dto, null, async (model) =>
         {
-            var exist = await _service.GetByUserIdAsync(model.UserId);
-            if (exist != null) return CreateResponse("success", exist, "success");
-
             var entity = _mapper.MapToDestination(model);
             var savedEntity = await _service.Create(entity);
             return CreateResponse("success", savedEntity, "success");
-        }, false);
+        });
     }
 
     [HttpPut]
@@ -92,7 +73,7 @@ public class UserCompanyController : BaseController
         if (existing == null)
             return NotFound("Register not found");
 
-        return await HandleClientOperationAsync<UserCompanyDTO>(dto, null, async (model) =>
+        return await HandleClientOperationAsync<WireListDTO>(dto, null, async (model) =>
         {
             await _service.Update(id, model);
             return NoContent();

@@ -65,11 +65,11 @@ public abstract class BaseController : ControllerBase
         }
     }
 
-    protected async Task<IActionResult> HandleClientOperationAsync<T>(string dto, IFormFile? file, Func<T, Task<IActionResult>> clientOperation) where T : class
+    protected async Task<IActionResult> HandleClientOperationAsync<T>(string dto, IFormFile? file, Func<T, Task<IActionResult>> clientOperation, bool useHeaderUserId = true) where T : class
     {
         try
         {
-            var userId = HttpContext.Request.Headers["User-Id"].ToString();
+            var userId = useHeaderUserId ? HttpContext.Request.Headers["User-Id"].ToString() : null;
             var model = JsonConvert.DeserializeObject<T>(dto);
             if (model == null)
             {
@@ -89,10 +89,13 @@ public abstract class BaseController : ControllerBase
                 }
             }
 
-            var userIdProperty = typeof(T).GetProperty("UserId");
-            if (userIdProperty != null)
+            if (useHeaderUserId && userId != null)
             {
-                userIdProperty.SetValue(model, userId);
+                var userIdProperty = typeof(T).GetProperty("UserId");
+                if (userIdProperty != null)
+                {
+                    userIdProperty.SetValue(model, userId);
+                }
             }
 
             return await clientOperation(model);
@@ -106,4 +109,5 @@ public abstract class BaseController : ControllerBase
             return StatusCode(500, "An error occurred while processing the client");
         }
     }
+
 }

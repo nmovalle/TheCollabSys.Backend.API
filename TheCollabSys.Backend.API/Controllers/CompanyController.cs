@@ -54,10 +54,25 @@ public class CompanyController : BaseController
         });
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Create([FromForm] string dto)
+    [HttpGet]
+    [Route("GetByDomain/{domain}")]
+    public async Task<IActionResult> GetByDomain(string domain)
     {
-        return await this.HandleClientOperationAsync<CompanyDTO>(dto, null, async (model) =>
+        return await ExecuteAsync(async () =>
+        {
+            var data = await _service.GetByIdDomainAsync(domain);
+
+            if (data == null)
+                return CreateNotFoundResponse<object>(null, "registers not found");
+
+            return CreateResponse("success", data, "success");
+        });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create([FromForm] string dto, [FromForm] IFormFile? file)
+    {
+        return await this.HandleClientOperationAsync<CompanyDTO>(dto, file, async (model) =>
         {
             var entity = _mapper.MapToDestination(model);
             var savedEntity = await _service.Create(entity);
