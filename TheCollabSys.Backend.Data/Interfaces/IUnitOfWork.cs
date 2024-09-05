@@ -22,6 +22,11 @@ public interface IUnitOfWork : IDisposable
     IMenuRolesRepository MenuRolesRepository { get; }
     IProjectAssignmentRepository ProjectAssignmentRepository { get; }
     IEmployerProjectAssignmentRepository EmployerProjectAssignmentRepository { get; }
+    IAccessCodeRepsitory AccessCodeRepsitory { get; }
+    ICompanyRepository CompanyRepository { get; }
+    IUserCompanyRepository UserCompanyRepository { get; }
+    IInvitationRepository InvitationRepository { get; }
+    IWireListRepository WireListRepository { get; }
 
     Task<int> CompleteAsync();
 }

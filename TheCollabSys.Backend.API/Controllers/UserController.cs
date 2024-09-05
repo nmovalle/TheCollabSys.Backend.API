@@ -101,6 +101,29 @@ public class UserController : ControllerBase
         return Ok(user);
     }
 
+    [HttpPost("simple-register")]
+    public async Task<IActionResult> RegisterWithoutPass([FromBody] UserWithoutPassModel model)
+    {
+        if (!IsValidRequest(model))
+            return BadRequest();
+
+        var user = await GetUser(model.Email);
+        if (user == null)
+        {
+            var userCreated = await this.AddNewUser(model.Email);
+            if (userCreated == null)
+                return StatusCode(500, "Failed to add user");
+
+            var newUserRole = await this.AddNewUserRole(userCreated.Id);
+            if (newUserRole == null)
+                return StatusCode(500, "Failed to add user role");
+
+            user = await this.GetUser(model.Email);
+        }
+
+        return Ok(user);
+    }
+
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
@@ -172,6 +195,11 @@ public class UserController : ControllerBase
     {
         return request.UserName != null && request.Password != null;
     }
+
+    private bool IsValidRequest(UserWithoutPassModel request)
+    {
+        return request.UserName != null;
+    }
     private async Task<AspNetUser> AddNewUser(string email, string password)
     {
         var newUser = new AspNetUser()
@@ -182,6 +210,18 @@ public class UserController : ControllerBase
         };
 
         var addUserResult = await _userService.AddUserPasswordAsync(newUser, password);
+        return addUserResult;
+    }
+    private async Task<AspNetUser> AddNewUser(string email)
+    {
+        var newUser = new AspNetUser()
+        {
+            Id = Guid.NewGuid().ToString(),
+            UserName = email,
+            Email = email
+        };
+
+        var addUserResult = await _userService.AddUserAsync(newUser);
         return addUserResult;
     }
     private async Task<AspNetUserRole> AddNewUserRole(string userid)

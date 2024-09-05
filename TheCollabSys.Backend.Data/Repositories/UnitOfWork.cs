@@ -26,7 +26,11 @@ public class UnitOfWork : IUnitOfWork
     public IMenuRolesRepository MenuRolesRepository { get; private set; }
     public IProjectAssignmentRepository ProjectAssignmentRepository { get; private set; }
     public IEmployerProjectAssignmentRepository EmployerProjectAssignmentRepository { get; private set; }
-
+    public IAccessCodeRepsitory AccessCodeRepsitory { get; private set; }
+    public ICompanyRepository CompanyRepository { get; private set; }
+    public IUserCompanyRepository UserCompanyRepository { get; private set; }
+    public IInvitationRepository InvitationRepository { get; private set; }
+    public IWireListRepository WireListRepository { get; private set; }
 
     public UnitOfWork(TheCollabsysContext context)
     {
@@ -52,6 +56,11 @@ public class UnitOfWork : IUnitOfWork
         MenuRolesRepository = new MenuRolesRepository(_context);
         ProjectAssignmentRepository = new ProjectAssignmentRepository(_context);
         EmployerProjectAssignmentRepository = new EmployerProjectAssignmentRepository(_context);
+        AccessCodeRepsitory = new AccessCodeRepsitory(_context);
+        CompanyRepository = new CompanyRepository(_context);
+        UserCompanyRepository = new UserCompanyRepository(_context);
+        InvitationRepository = new InvitationRepository(_context);
+        WireListRepository = new WireListRepository(_context);
     }
 
     public async Task<int> CompleteAsync()

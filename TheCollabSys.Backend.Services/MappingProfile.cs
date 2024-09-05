@@ -55,5 +55,22 @@ public class MappingProfile : Profile
         CreateMap<AspNetUserTokensDTO, AspNetUserToken>();
         CreateMap<AspNetUserToken, AspNetUserTokensDTO>();
 
+        CreateMap<AccessCodeDTO, DdAccessCode>();
+        CreateMap<DdAccessCode, AccessCodeDTO>();
+
+        CreateMap<CompanyDTO, DdCompany>();
+        CreateMap<DdCompany, CompanyDTO>();
+
+        CreateMap<UserCompanyDTO, DdUserCompany>();
+        CreateMap<DdUserCompany, UserCompanyDTO>();
+
+        CreateMap<DomainMasterDTO, DdDomainMaster>();
+        CreateMap<DdDomainMaster, DomainMasterDTO>();
+
+        CreateMap<InvitationDTO, DdInvitation>();
+        CreateMap<DdInvitation, InvitationDTO>();
+
+        CreateMap<WireListDTO, DdWireList>();
+        CreateMap<DdWireList, WireListDTO>();
     }
 }
