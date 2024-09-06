@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.Identity;
+﻿using Azure.Core;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -200,6 +201,15 @@ public class InvitationController : BaseController
         }
     }
 
+    [HttpPost]
+    [Route("request")]
+    public async Task<IActionResult> RequestInvitation([FromBody] UserInvitationRequest request)
+    {
+        await SendRequestInvitationEmailAsync(request.Email);
+
+        return CreateResponse("success", "Invitation request sent successfully", "success");
+    }
+
     [HttpPut]
     [Route("{id}")]
     public async Task<IActionResult> Update(int id, [FromForm] string dto)
@@ -270,6 +280,10 @@ public class InvitationController : BaseController
     {
         await _emailService.SendEmailAsync(email, subject, body);
     }
+    private async Task SendEmailToSupportAsync(string email, string subject, string body)
+    {
+        await _emailService.SendEmailToSupportAsync(email, subject, body);
+    }
 
     /// <summary>
     /// Método para construir el cuerpo del correo electrónico utilizando plantillas.
@@ -321,6 +335,11 @@ public class InvitationController : BaseController
         }
     }
 
+    private string GetInvitationEmailBody(string email)
+    {
+        return $"<p>A new user: <a href=\"mailto:{email}\">{email}</a> is requesting to join The Collabsys! Please contact them. </p>";
+    }
+
     /// <summary>
     /// Envía el correo de invitación.
     /// </summary>
@@ -330,6 +349,12 @@ public class InvitationController : BaseController
         var body = GetInvitationEmailBody(invitationUrl, token);
         var subject = "Welcome to Collabsys - Activate Your Account";
         await SendEmailAsync(email, subject, body);
+    }
+    private async Task SendRequestInvitationEmailAsync(string email)
+    {
+        var body = GetInvitationEmailBody(email);
+        var subject = "New User Request to Join The Collabsys Platform";
+        await SendEmailToSupportAsync(email, subject, body);
     }
 
     /// <summary>
@@ -341,7 +366,7 @@ public class InvitationController : BaseController
         var body = GetWelcomeEmailBody(accessUrl, email, password);
         await SendEmailAsync(email, subject, body);
     }
-
+    
     /// <summary>
     /// Genera una invitación.
     /// </summary>

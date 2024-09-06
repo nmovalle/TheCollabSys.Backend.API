@@ -42,4 +42,35 @@ public class EmailService : IEmailService
             Console.WriteLine(ex.Message);
         }
     }
+
+    public async Task SendEmailToSupportAsync(string userEmail, string subject, string body)
+    {
+        try
+        {
+            var smtpClient = new SmtpClient(_configuration["EmailSettings:SmtpServer"])
+            {
+                Port = int.Parse(_configuration["EmailSettings:Port"]),
+                Credentials = new NetworkCredential(_configuration["EmailSettings:Username"], _configuration["EmailSettings:Password"]),
+                EnableSsl = true,
+            };
+
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(userEmail),
+                Sender = new MailAddress(userEmail),
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true,
+            };
+
+            mailMessage.To.Add(_configuration["EmailSettings:SupportEmail"]);
+
+            await smtpClient.SendMailAsync(mailMessage);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
 }
