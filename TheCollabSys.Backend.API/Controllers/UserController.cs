@@ -21,6 +21,7 @@ public class UserController : ControllerBase
     private readonly ILogger<UserController> _logger;
     private readonly IUserService _userService;
     private readonly IUserRoleService _userRoleService;
+    private readonly IWireListService _wireListService;
     private readonly IMapperService<UserDTO, AspNetUser> _mapperService;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
 
@@ -28,6 +29,7 @@ public class UserController : ControllerBase
         ILogger<UserController> logger, 
         IUserService userService,
         IUserRoleService userRoleService,
+        IWireListService wireListService,
         IMapperService<UserDTO, AspNetUser> mapperService,
         IJwtTokenGenerator jwtTokenGenerator
         )
@@ -35,6 +37,7 @@ public class UserController : ControllerBase
         _logger = logger;
         _userService = userService;
         _userRoleService = userRoleService;
+        _wireListService = wireListService;
         _mapperService = mapperService;
         _jwtTokenGenerator = jwtTokenGenerator;
     }
@@ -161,8 +164,11 @@ public class UserController : ControllerBase
             Email = user.UserName
         };
 
-        // Actualizar el password
         await _userService.UpdatePasswordAsync(userToUpdate, model.NewPassword);
+
+        var wireList = await _wireListService.GetByEmail(user.Email);
+        wireList.PasswordConfirmed = true;
+        await _wireListService.Update(wireList.Id, wireList);
 
         return Ok("Password updated successfully");
     }

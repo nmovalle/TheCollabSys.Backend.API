@@ -13,4 +13,5 @@ public partial class DdWireList
     public int RoleId { get; set; }
 
     public bool IsBlackList { get; set; }
+    public bool PasswordConfirmed { get; set; }
 }
