@@ -13,4 +13,6 @@ public class WireListDTO
     public int RoleId { get; set; }
 
     public bool IsBlackList { get; set; }
+
+    public bool PasswordConfirmed { get; set; }
 }

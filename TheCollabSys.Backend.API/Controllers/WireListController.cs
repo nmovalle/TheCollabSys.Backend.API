@@ -54,6 +54,21 @@ public class WireListController : BaseController
         });
     }
 
+    [HttpGet]
+    [Route("GetUserPasswordConfirmed/{username}")]
+    public async Task<IActionResult> GetUserPasswordConfirmed(string username)
+    {
+        return await ExecuteAsync(async () =>
+        {
+            var data = await _service.GetByEmail(username);
+
+            if (data == null)
+                return CreateNotFoundResponse<object>(null, "register not found");
+
+            return CreateResponse("success", data, "success");
+        });
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create([FromForm] string dto)
     {
