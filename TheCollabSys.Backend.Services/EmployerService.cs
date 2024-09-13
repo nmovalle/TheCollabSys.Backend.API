@@ -1,5 +1,4 @@
 ﻿using TheCollabSys.Backend.Data.Interfaces;
-using TheCollabSys.Backend.Data;
 using TheCollabSys.Backend.Entity.DTOs;
 using TheCollabSys.Backend.Entity.Models;
 using Microsoft.EntityFrameworkCore;
@@ -10,21 +9,19 @@ public class EmployerService : IEmployerService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapperService<EmployerDTO, DdEmployer> _mapperService;
-    private readonly TheCollabsysContext _context;
 
     public EmployerService(
         IUnitOfWork unitOfWork,
-        IMapperService<EmployerDTO, DdEmployer> mapperService,
-        TheCollabsysContext context
+        IMapperService<EmployerDTO, DdEmployer> mapperService
         )
     {
         _unitOfWork = unitOfWork;
         _mapperService = mapperService;
-        _context = context;
     }
-    public IAsyncEnumerable<EmployerDTO> GetAll()
+    public IAsyncEnumerable<EmployerDTO> GetAll(int companyId)
     {
         var data = _unitOfWork.EmployerRepository.GetAllQueryable()
+            .Where(c => c.CompanyId == companyId)
             .Select(c => new EmployerDTO
             {
                 EmployerId = c.EmployerId,
@@ -42,10 +39,10 @@ public class EmployerService : IEmployerService
         return data;
     }
 
-    public async Task<EmployerDTO?> GetByIdAsync(int id)
+    public async Task<EmployerDTO?> GetByIdAsync(int companyId, int id)
     {
         var resp = await _unitOfWork.EmployerRepository.GetAllQueryable()
-            .Where(c => c.EmployerId == id)
+            .Where(c => c.CompanyId == companyId && c.EmployerId == id)
             .Select(c => new EmployerDTO
             {
                 EmployerId = c.EmployerId,
