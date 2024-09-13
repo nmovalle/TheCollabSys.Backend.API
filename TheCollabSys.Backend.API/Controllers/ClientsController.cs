@@ -35,14 +35,14 @@ namespace TheCollabSys.Backend.API.Controllers
         [ActionName(nameof(GetAllClientsAsync))]
         public async Task<IActionResult> GetAllClientsAsync()
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteWithCompanyIdAsync(async (companyId) =>
             {
-                var data = await _clientService.GetAllClientsAsync().ToListAsync();
+                var data = await _clientService.GetAllClientsAsync(companyId).ToListAsync();
 
                 if (data.Any())
                     return CreateResponse("success", data, "success");
 
-                return CreateNotFoundResponse<object>(null, "Registers not founds");
+                return CreateNotFoundResponse<object>(null, "Registers not found");
             });
         }
 
@@ -51,9 +51,9 @@ namespace TheCollabSys.Backend.API.Controllers
         [ActionName(nameof(GetClientByIdAsync))]
         public async Task<IActionResult> GetClientByIdAsync(int id)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteWithCompanyIdAsync(async (companyId) =>
             {
-                var queryableData = await _clientService.GetClientByIdAsync(id);
+                var queryableData = await _clientService.GetClientByIdAsync(companyId,id);
                 var data = await queryableData.ToListAsync();
 
                 if (data == null || !data.Any())
@@ -68,8 +68,15 @@ namespace TheCollabSys.Backend.API.Controllers
         [ActionName(nameof(SearchClientsByName))]
         public async Task<IActionResult> SearchClientsByName(string name)
         {
-            var clients = await _clientService.GetClientsByNameAsync(name);
-            return Ok(clients);
+            return await ExecuteWithCompanyIdAsync(async (companyId) =>
+            {
+                var data = await _clientService.GetClientsByNameAsync(companyId, name);
+
+                if (data == null)
+                    return CreateNotFoundResponse<object>(null, "register was not found");
+
+                return CreateResponse("success", data, "success");
+            });
         }
 
         [HttpPost]
@@ -88,14 +95,14 @@ namespace TheCollabSys.Backend.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> UpdateClient(int id, [FromForm] string clientDTO, [FromForm] IFormFile? file)
         {
-            var existingClient = await _clientService.GetClientByIdAsync(id);
-            if (existingClient == null)
-            {
-                return NotFound();
-            }
-
             return await this.HandleClientOperationAsync<ClientDTO>(clientDTO, file, async (model) =>
             {
+                if (model.CompanyId == null) return NotFound("Company Id is missing.");
+
+                var existingClient = await _clientService.GetClientByIdAsync((int)model.CompanyId, id);
+                if (existingClient == null) return NotFound();
+
+
                 await _clientService.UpdateClientAsync(id, model);
                 return NoContent();
             });
@@ -108,11 +115,11 @@ namespace TheCollabSys.Backend.API.Controllers
             try
             {
                 await _clientService.DeleteClientAsync(id);
-                return NoContent(); // 204 No Content for successful deletion
+                return NoContent();
             }
             catch (ArgumentException ex)
             {
-                return NotFound(ex.Message); // 404 Not Found if the client does not exist
+                return NotFound(ex.Message);
             }
         }
     }

@@ -4,5 +4,5 @@ namespace TheCollabSys.Backend.Data.Interfaces;
 
 public interface IClientRepository : IRepository<DdClient>
 {
-    Task<IEnumerable<DdClient>> GetClientsByNameAsync(string name);
+    Task<IEnumerable<DdClient>> GetClientsByNameAsync(int companyId, string name);
 }

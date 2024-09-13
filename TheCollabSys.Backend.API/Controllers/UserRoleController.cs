@@ -18,13 +18,15 @@ namespace TheCollabSys.Backend.API.Controllers
     {
         private readonly ILogger<UserRoleController> _logger;
         private readonly IUserRoleService _userRoleService;
+        private readonly IUserCompanyService _userCompanyService;
         private readonly IMapperService<UserRoleDTO, AspNetUserRole> _mapperService;
         private readonly IJwtTokenGenerator _jwtTokenGenerator;
 
-        public UserRoleController(ILogger<UserRoleController> logger, IUserRoleService userRoleService, IMapperService<UserRoleDTO, AspNetUserRole> mapperService, IJwtTokenGenerator jwtTokenGenerator)
+        public UserRoleController(ILogger<UserRoleController> logger, IUserRoleService userRoleService, IUserCompanyService userCompanyService, IMapperService<UserRoleDTO, AspNetUserRole> mapperService, IJwtTokenGenerator jwtTokenGenerator)
         {
             _logger = logger;
             _userRoleService = userRoleService;
+            _userCompanyService = userCompanyService;
             _mapperService = mapperService;
             _jwtTokenGenerator = jwtTokenGenerator;
         }
@@ -54,17 +56,17 @@ namespace TheCollabSys.Backend.API.Controllers
         {
             var updatedEntity = await _userRoleService.UpdateUserRoleByUserName(username, newRoleId);
 
-            if (updatedEntity == null)
-            {
-                return NotFound();
-            }
+            if (updatedEntity == null) return NotFound();
 
-
-            // Obtener el usuario con su rol
             var userRole = await GetUserRole(username);
+            if (userRole == null) return NotFound("user role not found.");
+
             var token = await GenerateToken(username);
 
-            return Ok(new LoginResponse { UserRole = userRole, AuthToken = token });
+            var usercompany = await GetUserCompany(userRole.UserId);
+            if (usercompany == null) return NotFound("user company not found.");
+
+            return Ok(new LoginResponse { UserRole = userRole, AuthToken = token, UserCompany = usercompany });
         }
 
         private async Task<UserRoleDTO?> GetUserRole(string username)
@@ -75,6 +77,11 @@ namespace TheCollabSys.Backend.API.Controllers
         private async Task<AuthTokenResponse> GenerateToken(string username)
         {
             return await _jwtTokenGenerator.GenerateToken(username);
+        }
+
+        private async Task<UserCompanyDTO?> GetUserCompany(string userid)
+        {
+            return await _userCompanyService.GetByUserIdAsync(userid);
         }
     }
 }

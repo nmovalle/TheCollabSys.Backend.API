@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using TheCollabSys.Backend.Data;
 using TheCollabSys.Backend.Data.Interfaces;
 using TheCollabSys.Backend.Entity.DTOs;
@@ -21,45 +22,49 @@ public class ClientService : IClientService
         _clientMapper = clientMapper;
     }
 
-    public IAsyncEnumerable<ClientDTO> GetAllClientsAsync()
+    public IAsyncEnumerable<ClientDTO> GetAllClientsAsync(int companyId)
     {
-        return _unitOfWork.Clients.GetAllProjectedAsAsyncEnumerable(client => new ClientDTO
-        {
-            ClientID = client.ClientId,
-            ClientName = client.ClientName,
-            Address = client.Address,
-            Phone = client.Phone,
-            Email = client.Email,
-            Logo = client.Logo,
-            Filetype = client.Filetype,
-            Active = client.Active,
-            DateCreated = client.DateCreated,
-            DateUpdate = client.DateUpdate,
-            UserId = client.UserId,
-        });
+        return _unitOfWork.Clients.GetAllQueryable()
+            .Where(client => client.CompanyId == companyId)
+            .Select(client => new ClientDTO
+            {
+                ClientID = client.ClientId,
+                ClientName = client.ClientName,
+                Address = client.Address,
+                Phone = client.Phone,
+                Email = client.Email,
+                Logo = client.Logo,
+                Filetype = client.Filetype,
+                Active = client.Active,
+                DateCreated = client.DateCreated,
+                DateUpdate = client.DateUpdate,
+                UserId = client.UserId,
+            })
+            .AsAsyncEnumerable();
     }
 
-    public Task<IQueryable<ClientDTO>> GetClientByIdAsync(int id)
-{
-    var queryableData = _context.DD_Clients
-        .Where(c => c.ClientId == id)
-        .Select(client => new ClientDTO
-        {
-            ClientID = client.ClientId,
-            ClientName = client.ClientName,
-            Address = client.Address,
-            Phone = client.Phone,
-            Email = client.Email,
-            Logo = client.Logo,
-            Filetype = client.Filetype,
-            Active = client.Active,
-            DateCreated = client.DateCreated,
-            DateUpdate = client.DateUpdate,
-            UserId = client.UserId
-        });
 
-    return Task.FromResult(queryableData);
-}
+    public Task<IQueryable<ClientDTO>> GetClientByIdAsync(int companyId, int id)
+    {
+        var queryableData = _context.DD_Clients
+            .Where(c => c.CompanyId == companyId && c.ClientId == id)
+            .Select(client => new ClientDTO
+            {
+                ClientID = client.ClientId,
+                ClientName = client.ClientName,
+                Address = client.Address,
+                Phone = client.Phone,
+                Email = client.Email,
+                Logo = client.Logo,
+                Filetype = client.Filetype,
+                Active = client.Active,
+                DateCreated = client.DateCreated,
+                DateUpdate = client.DateUpdate,
+                UserId = client.UserId
+            });
+
+        return Task.FromResult(queryableData);
+    }
 
     public async Task<DdClient> CreateClientAsync(DdClient clientEntity)
     {
@@ -97,9 +102,9 @@ public class ClientService : IClientService
         await _unitOfWork.CompleteAsync();
     }
 
-    public async Task<IEnumerable<ClientDTO>> GetClientsByNameAsync(string name)
+    public async Task<IEnumerable<ClientDTO>> GetClientsByNameAsync(int companyId, string name)
     {
-        var clients = await _unitOfWork.Clients.GetClientsByNameAsync(name);
+        var clients = await _unitOfWork.Clients.GetClientsByNameAsync(companyId, name);
         var clientsDTO = clients.Select(_clientMapper.MapToSource).ToList();
 
         return clientsDTO;

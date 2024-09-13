@@ -6,4 +6,5 @@ public class LoginResponse
 {
     public UserRoleDTO UserRole { get; set; }
     public AuthTokenResponse AuthToken { get; set; }
+    public UserCompanyDTO UserCompany { get; set; }
 }

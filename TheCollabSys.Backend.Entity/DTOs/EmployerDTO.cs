@@ -12,4 +12,5 @@ public record EmployerDTO
     public DateTime? DateUpdate { get; set; }
     public bool? Active { get; set; }
     public string? UserId { get; init; }
+    public int? CompanyId { get; set; }
 }

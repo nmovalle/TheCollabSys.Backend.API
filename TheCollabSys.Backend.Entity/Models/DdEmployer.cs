@@ -21,6 +21,10 @@ public partial class DdEmployer
 
     public DateTime? DateUpdate { get; set; }
 
+    public int? CompanyId { get; set; }
+
+    public virtual DdCompany? Company { get; set; }
+
     public virtual ICollection<DdEmployerProjectAssignment> DdEmployerProjectAssignments { get; set; } = new List<DdEmployerProjectAssignment>();
 
     public virtual ICollection<DdEngineer> DdEngineers { get; set; } = new List<DdEngineer>();

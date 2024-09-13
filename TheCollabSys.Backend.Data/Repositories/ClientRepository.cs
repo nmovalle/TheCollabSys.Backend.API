@@ -10,10 +10,10 @@ public class ClientRepository : Repository<DdClient>, IClientRepository
     {
     }
 
-    public async Task<IEnumerable<DdClient>> GetClientsByNameAsync(string name)
+    public async Task<IEnumerable<DdClient>> GetClientsByNameAsync(int companyId, string name)
     {
         return await _context.DD_Clients
-            .Where(c => c.ClientName.Contains(name))
+            .Where(c => c.CompanyId == companyId && c.ClientName.Contains(name))
             .ToListAsync();
     }
 }

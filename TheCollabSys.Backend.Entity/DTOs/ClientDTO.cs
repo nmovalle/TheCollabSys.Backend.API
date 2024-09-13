@@ -13,4 +13,5 @@ public class ClientDTO : IUserOwned
     public DateTime? DateCreated { get; set; }
     public DateTime? DateUpdate { get; set; }
     public string? UserId { get; set; }
+    public int? CompanyId { get; set; }
 }

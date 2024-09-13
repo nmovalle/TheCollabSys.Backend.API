@@ -29,4 +29,5 @@ public class EngineerDTO
 
     public string? Filetype { get; set; }
     public double? Rating { get; set; }
+    public int? CompanyId { get; set; }
 }

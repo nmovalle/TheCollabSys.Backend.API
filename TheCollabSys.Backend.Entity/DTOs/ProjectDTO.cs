@@ -14,4 +14,5 @@ public record ProjectDTO
     public int StatusId { get; set; }
     public string? UserId { get; set; }
     public DateTime? DateUpdate { get; set; }
+    public int? CompanyId { get; set; }
 }
