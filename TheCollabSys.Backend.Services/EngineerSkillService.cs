@@ -17,11 +17,12 @@ public class EngineerSkillService : IEngineerSkillService
         _unitOfWork = unitOfWork;
     }
 
-    public IAsyncEnumerable<EngineerSkillDetailDTO> GetAll()
+    public IAsyncEnumerable<EngineerSkillDetailDTO> GetAll(int companyId)
     {
         var data = (from ps in _unitOfWork.EngineerSkillRepository.GetAllQueryable()
                     join p in _unitOfWork.EngineerRepository.GetAllQueryable() on ps.EngineerId equals p.EngineerId
                     join s in _unitOfWork.SkillRepository.GetAllQueryable() on ps.SkillId equals s.SkillId
+                    where p.CompanyId == companyId
                     group new { ps, p, s } by new { ps.EngineerId, p.EngineerName, p.FirstName, p.LastName } into grouped
                     select new EngineerSkillDetailDTO
                     {
@@ -40,13 +41,13 @@ public class EngineerSkillService : IEngineerSkillService
         return data;
     }
 
-    public Task<EngineerSkillDetailDTO?> GetByIdAsync(int id)
+    public Task<EngineerSkillDetailDTO?> GetByIdAsync(int companyId, int id)
     {
         var data = (from ps in _unitOfWork.EngineerSkillRepository.GetAllQueryable()
-                    join p in _unitOfWork.EngineerRepository.GetAllQueryable() on ps.EngineerId equals p.EngineerId
+                    join e in _unitOfWork.EngineerRepository.GetAllQueryable() on ps.EngineerId equals e.EngineerId
                     join s in _unitOfWork.SkillRepository.GetAllQueryable() on ps.SkillId equals s.SkillId
-                    where ps.EngineerId == id
-                    group new { ps, p, s } by new { ps.EngineerId, p.EngineerName, p.FirstName, p.LastName } into grouped
+                    where e.CompanyId == companyId && ps.EngineerId == id
+                    group new { ps, e, s } by new { ps.EngineerId, e.EngineerName, e.FirstName, e.LastName } into grouped
                     select new EngineerSkillDetailDTO
                     {
                         EngineerId = grouped.Key.EngineerId,

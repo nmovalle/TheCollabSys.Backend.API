@@ -13,11 +13,12 @@ public class ProjectAssignmentService : IProjectAssignmentService
         _unitOfWork = unitOfWork;
     }
 
-    public IAsyncEnumerable<ProjectAssignmentDetailDTO> GetAll()
+    public IAsyncEnumerable<ProjectAssignmentDetailDTO> GetAll(int companyId)
     {
         var data = (from pa in _unitOfWork.ProjectAssignmentRepository.GetAllQueryable()
                     join p in _unitOfWork.ProjectRepository.GetAllQueryable() on pa.ProjectId equals p.ProjectId
                     join e in _unitOfWork.EngineerRepository.GetAllQueryable() on pa.EngineerId equals e.EngineerId
+                    where p.CompanyId == companyId
                     group new { pa, p, e } by new { pa.ProjectId, p.ProjectName } into grouped
                     select new ProjectAssignmentDetailDTO
                     {
@@ -45,12 +46,12 @@ public class ProjectAssignmentService : IProjectAssignmentService
         return data;
     }
 
-    public Task<ProjectAssignmentDetailDTO?> GetByIdAsync(int id)
+    public Task<ProjectAssignmentDetailDTO?> GetByIdAsync(int companyId, int id)
     {
         var data = (from pa in _unitOfWork.ProjectAssignmentRepository.GetAllQueryable()
                     join p in _unitOfWork.ProjectRepository.GetAllQueryable() on pa.ProjectId equals p.ProjectId
                     join e in _unitOfWork.EngineerRepository.GetAllQueryable() on pa.EngineerId equals e.EngineerId
-                    where pa.ProjectId == id
+                    where p.CompanyId == companyId && pa.ProjectId == id
                     group new { pa, p, e } by new { pa.ProjectId, p.ProjectName } into grouped
                     select new ProjectAssignmentDetailDTO
                     {

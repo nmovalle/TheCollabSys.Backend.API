@@ -244,12 +244,21 @@ public partial class TheCollabsysContext : DbContext
         {
             entity.HasKey(e => e.ClientId);
 
+            entity.Property(e => e.ClientId);
             entity.Property(e => e.Address).HasMaxLength(255);
             entity.Property(e => e.ClientName).HasMaxLength(255);
+            entity.Property(e => e.DateCreated);
+            entity.Property(e => e.DateUpdate);
             entity.Property(e => e.Email).HasMaxLength(100);
+            entity.Property(e => e.Filetype)
+                .HasMaxLength(50)
+                .IsUnicode(false);
             entity.Property(e => e.Phone).HasMaxLength(50);
             entity.Property(e => e.UserId)
                 .HasMaxLength(450);
+
+            entity.HasOne(d => d.Company).WithMany(p => p.DdClients)
+                .HasForeignKey(d => d.CompanyId);
 
             entity.HasOne(d => d.User).WithMany(p => p.DdClients)
                 .HasForeignKey(d => d.UserId);
@@ -299,7 +308,10 @@ public partial class TheCollabsysContext : DbContext
         {
             entity.HasKey(e => e.EmployerId);
 
+            entity.Property(e => e.EmployerId);
             entity.Property(e => e.Address).HasMaxLength(255);
+            entity.Property(e => e.DateCreated);
+            entity.Property(e => e.DateUpdate);
             entity.Property(e => e.EmployerName).HasMaxLength(255);
             entity.Property(e => e.Filetype)
                 .HasMaxLength(50)
@@ -307,6 +319,9 @@ public partial class TheCollabsysContext : DbContext
             entity.Property(e => e.Phone).HasMaxLength(50);
             entity.Property(e => e.UserId)
                 .HasMaxLength(450);
+
+            entity.HasOne(d => d.Company).WithMany(p => p.DdEmployers)
+                .HasForeignKey(d => d.CompanyId);
 
             entity.HasOne(d => d.User).WithMany(p => p.DdEmployers)
                 .HasForeignKey(d => d.UserId);
@@ -329,13 +344,24 @@ public partial class TheCollabsysContext : DbContext
         {
             entity.HasKey(e => e.EngineerId);
 
+            entity.Property(e => e.EngineerId);
+            entity.Property(e => e.DateCreated);
+            entity.Property(e => e.DateUpdate);
             entity.Property(e => e.Email).HasMaxLength(100);
+            entity.Property(e => e.EmployerId);
             entity.Property(e => e.EngineerName).HasMaxLength(255);
+            entity.Property(e => e.Filetype)
+                .HasMaxLength(50)
+                .IsUnicode(false);
             entity.Property(e => e.FirstName).HasMaxLength(50);
+            entity.Property(e => e.IsActive);
             entity.Property(e => e.LastName).HasMaxLength(50);
             entity.Property(e => e.Phone).HasMaxLength(50);
             entity.Property(e => e.UserId)
                 .HasMaxLength(450);
+
+            entity.HasOne(d => d.Company).WithMany(p => p.DdEngineers)
+                .HasForeignKey(d => d.CompanyId);
 
             entity.HasOne(d => d.Employer).WithMany(p => p.DdEngineers)
                 .HasForeignKey(d => d.EmployerId)
@@ -514,6 +540,9 @@ public partial class TheCollabsysContext : DbContext
             entity.HasOne(d => d.Client).WithMany(p => p.DdProjects)
                 .HasForeignKey(d => d.ClientId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
+
+            entity.HasOne(d => d.Company).WithMany(p => p.DdProjects)
+                .HasForeignKey(d => d.CompanyId);
 
             entity.HasOne(d => d.Status).WithMany(p => p.DdProjects)
                 .HasForeignKey(d => d.StatusId)

@@ -23,7 +23,11 @@ public partial class DdProject
 
     public DateTime? DateUpdate { get; set; }
 
+    public int? CompanyId { get; set; }
+
     public virtual DdClient Client { get; set; } = null!;
+
+    public virtual DdCompany? Company { get; set; }
 
     public virtual ICollection<DdAssignmentHistory> DdAssignmentHistories { get; set; } = new List<DdAssignmentHistory>();
 

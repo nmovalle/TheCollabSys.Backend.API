@@ -25,9 +25,9 @@ public class ProjectAssignmentsController : BaseController
     [HttpGet]
     public async Task<IActionResult> GetAllProjectAssignments()
     {
-        return await ExecuteAsync(async () =>
+        return await ExecuteWithCompanyIdAsync(async (companyId) =>
         {
-            var data = await _service.GetAll().ToListAsync();
+            var data = await _service.GetAll(companyId).ToListAsync();
 
             if (data.Any())
                 return CreateResponse("success", data, "success");
@@ -40,9 +40,9 @@ public class ProjectAssignmentsController : BaseController
     [Route("{id}")]
     public async Task<IActionResult> GetAllProjectAssignmentsById(int id)
     {
-        return await ExecuteAsync(async () =>
+        return await ExecuteWithCompanyIdAsync(async (companyId) =>
         {
-            var data = await _service.GetByIdAsync(id);
+            var data = await _service.GetByIdAsync(companyId, id);
 
             if (data == null)
                 return CreateResponse<object>("success", null, "register not found");

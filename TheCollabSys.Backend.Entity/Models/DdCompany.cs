@@ -19,4 +19,12 @@ public partial class DdCompany
     public string? FileType { get; set; }
 
     public bool? Active { get; set; }
+
+    public virtual ICollection<DdClient> DdClients { get; set; } = new List<DdClient>();
+
+    public virtual ICollection<DdEmployer> DdEmployers { get; set; } = new List<DdEmployer>();
+
+    public virtual ICollection<DdEngineer> DdEngineers { get; set; } = new List<DdEngineer>();
+
+    public virtual ICollection<DdProject> DdProjects { get; set; } = new List<DdProject>();
 }

@@ -7,6 +7,41 @@ namespace TheCollabSys.Backend.API.Controllers;
 
 public abstract class BaseController : ControllerBase
 {
+    protected int GetCompanyIdFromHeaders()
+    {
+        var companyIdString = HttpContext.Request.Headers["Company-Id"].ToString();
+
+        // Verificar si el Company-Id está presente en los headers
+        if (string.IsNullOrEmpty(companyIdString))
+        {
+            throw new ArgumentException("Company-Id header is missing or invalid.");
+        }
+
+        // Intentar convertir a int
+        if (!int.TryParse(companyIdString, out var companyId))
+        {
+            throw new ArgumentException("Company-Id header must be a valid integer.");
+        }
+
+        return companyId;
+    }
+
+    protected async Task<IActionResult> ExecuteWithCompanyIdAsync(Func<int, Task<IActionResult>> action)
+    {
+        try
+        {
+            var companyId = GetCompanyIdFromHeaders();
+            return await action(companyId);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred: {ex.Message}");
+        }
+    }
     protected IActionResult CreateResponse<T>(string status, T data, string message)
     {
         var response = new Response<T>
@@ -70,6 +105,8 @@ public abstract class BaseController : ControllerBase
         try
         {
             var userId = useHeaderUserId ? HttpContext.Request.Headers["User-Id"].ToString() : null;
+            var companyId = HttpContext.Request.Headers["Company-Id"].ToString();
+
             var model = JsonConvert.DeserializeObject<T>(dto);
             if (model == null)
             {
@@ -95,6 +132,15 @@ public abstract class BaseController : ControllerBase
                 if (userIdProperty != null)
                 {
                     userIdProperty.SetValue(model, userId);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(companyId))
+            {
+                var companyIdProperty = typeof(T).GetProperty("CompanyId");
+                if (companyIdProperty != null && int.TryParse(companyId, out var companyIdValue))
+                {
+                    companyIdProperty.SetValue(model, companyIdValue);
                 }
             }
 

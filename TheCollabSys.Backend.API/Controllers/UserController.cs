@@ -21,6 +21,7 @@ public class UserController : ControllerBase
     private readonly ILogger<UserController> _logger;
     private readonly IUserService _userService;
     private readonly IUserRoleService _userRoleService;
+    private readonly IUserCompanyService _userCompanyService;
     private readonly IWireListService _wireListService;
     private readonly IMapperService<UserDTO, AspNetUser> _mapperService;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
@@ -29,6 +30,7 @@ public class UserController : ControllerBase
         ILogger<UserController> logger, 
         IUserService userService,
         IUserRoleService userRoleService,
+        IUserCompanyService userCompanyService,
         IWireListService wireListService,
         IMapperService<UserDTO, AspNetUser> mapperService,
         IJwtTokenGenerator jwtTokenGenerator
@@ -37,6 +39,7 @@ public class UserController : ControllerBase
         _logger = logger;
         _userService = userService;
         _userRoleService = userRoleService;
+        _userCompanyService = userCompanyService;
         _wireListService = wireListService;
         _mapperService = mapperService;
         _jwtTokenGenerator = jwtTokenGenerator;
@@ -134,15 +137,18 @@ public class UserController : ControllerBase
 
         if (isAuthenticated)
         {
-            // El usuario ha iniciado sesión exitosamente
             var userRole = await GetUserRole(model.UserName);
+            if (userRole == null) return NotFound("user role not found.");
+
             var token = await GenerateToken(model.UserName);
 
-            return Ok(new LoginResponse { UserRole = userRole, AuthToken = token });
+            var usercompany = await GetUserCompany(userRole.UserId);
+            if (usercompany == null) return NotFound("user company not found.");
+
+            return Ok(new LoginResponse { UserRole = userRole, AuthToken = token, UserCompany = usercompany });
         }
         else
         {
-            // Las credenciales son inválidas
             return Unauthorized("Invalid username or password");
         }
     }
@@ -252,5 +258,9 @@ public class UserController : ControllerBase
     private async Task<AuthTokenResponse> GenerateToken(string username)
     {
         return await _jwtTokenGenerator.GenerateToken(username);
+    }
+    private async Task<UserCompanyDTO?> GetUserCompany(string userid)
+    {
+        return await _userCompanyService.GetByUserIdAsync(userid);
     }
 }

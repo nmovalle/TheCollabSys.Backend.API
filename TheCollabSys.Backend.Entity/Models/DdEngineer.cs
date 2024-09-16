@@ -27,6 +27,10 @@ public partial class DdEngineer
 
     public string? Filetype { get; set; }
 
+    public int? CompanyId { get; set; }
+
+    public virtual DdCompany? Company { get; set; }
+
     public virtual ICollection<DdAssignmentHistory> DdAssignmentHistories { get; set; } = new List<DdAssignmentHistory>();
 
     public virtual ICollection<DdClientRating> DdClientRatings { get; set; } = new List<DdClientRating>();

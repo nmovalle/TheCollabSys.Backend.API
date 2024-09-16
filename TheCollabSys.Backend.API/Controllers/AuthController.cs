@@ -127,7 +127,7 @@ namespace TheCollabSys.Backend.API.Controllers
             var userRole = await GetUserRole(user.UserName);
             var token = await GenerateToken(user.UserName);
 
-            return Ok(new LoginResponse { UserRole= userRole, AuthToken = token });
+            return Ok(new LoginResponse { UserRole= userRole, AuthToken = token, UserCompany = usercompany });
         }
 
         private bool IsValidRequest(OAuthRequest request)

@@ -24,9 +24,9 @@ public class EngineerSkillsController : BaseController
     [HttpGet]
     public async Task<IActionResult> GetAllEngineersSkills()
     {
-        return await ExecuteAsync(async () =>
+        return await ExecuteWithCompanyIdAsync(async (companyId) =>
         {
-            var data = await _service.GetAll().ToListAsync();
+            var data = await _service.GetAll(companyId).ToListAsync();
 
             if (data.Any())
                 return CreateResponse("success", data, "success");
@@ -39,9 +39,9 @@ public class EngineerSkillsController : BaseController
     [Route("{id}")]
     public async Task<IActionResult> GetAllEngineerSkillsById(int id)
     {
-        return await ExecuteAsync(async () =>
+        return await ExecuteWithCompanyIdAsync(async (companyId) =>
         {
-            var data = await _service.GetByIdAsync(id);
+            var data = await _service.GetByIdAsync(companyId, id);
 
             if (data == null)
                 return CreateResponse<object>("success", null, "register not found");

@@ -23,11 +23,12 @@ public class ProjectSkillService : IProjectSkillService
         _context = context;
     }
 
-    public IAsyncEnumerable<ProjectSkillDetailDTO> GetAll()
+    public IAsyncEnumerable<ProjectSkillDetailDTO> GetAll(int companyId)
     {
         var data = (from ps in _unitOfWork.ProjectSkillRepository.GetAllQueryable()
                     join p in _unitOfWork.ProjectRepository.GetAllQueryable() on ps.ProjectId equals p.ProjectId
                     join s in _unitOfWork.SkillRepository.GetAllQueryable() on ps.SkillId equals s.SkillId
+                    where p.CompanyId == companyId
                     group new { ps, p, s } by new { ps.ProjectId, p.ProjectName } into grouped
                     select new ProjectSkillDetailDTO
                     {
@@ -44,12 +45,12 @@ public class ProjectSkillService : IProjectSkillService
         return data;
     }
 
-    public Task<ProjectSkillDetailDTO?> GetByIdAsync(int id)
+    public Task<ProjectSkillDetailDTO?> GetByIdAsync(int companyId, int id)
     {
         var data = (from ps in _unitOfWork.ProjectSkillRepository.GetAllQueryable()
                     join p in _unitOfWork.ProjectRepository.GetAllQueryable() on ps.ProjectId equals p.ProjectId
                     join s in _unitOfWork.SkillRepository.GetAllQueryable() on ps.SkillId equals s.SkillId
-                    where ps.ProjectId == id
+                    where p.CompanyId == companyId && ps.ProjectId == id
                     group new { ps, p, s } by new { ps.ProjectId, p.ProjectName } into grouped
                     select new ProjectSkillDetailDTO
                     {

@@ -13,12 +13,13 @@ public class EmployerProjectAssignmentService : IEmployerProjectAssignmentServic
         _unitOfWork = unitOfWork;
     }
 
-    public IAsyncEnumerable<EmployerProjectAssignmentDetailDTO> GetAll()
+    public IAsyncEnumerable<EmployerProjectAssignmentDetailDTO> GetAll(int companyId)
     {
         var data = (from epa in _unitOfWork.EmployerProjectAssignmentRepository.GetAllQueryable()
                     join e in _unitOfWork.EmployerRepository.GetAllQueryable() on epa.EmployerId equals e.EmployerId
                     join p in _unitOfWork.ProjectRepository.GetAllQueryable() on epa.ProjectId equals p.ProjectId
                     join c in _unitOfWork.Clients.GetAllQueryable() on p.ClientId equals c.ClientId
+                    where p.CompanyId == companyId
                     group new { epa, e, p, c } by new { epa.EmployerId, e.EmployerName } into grouped
                     select new EmployerProjectAssignmentDetailDTO
                     {
@@ -44,13 +45,13 @@ public class EmployerProjectAssignmentService : IEmployerProjectAssignmentServic
         return data;
     }
 
-    public Task<EmployerProjectAssignmentDetailDTO?> GetByIdAsync(int id)
+    public Task<EmployerProjectAssignmentDetailDTO?> GetByIdAsync(int companyId, int id)
     {
         var data = (from epa in _unitOfWork.EmployerProjectAssignmentRepository.GetAllQueryable()
                     join e in _unitOfWork.EmployerRepository.GetAllQueryable() on epa.EmployerId equals e.EmployerId
                     join p in _unitOfWork.ProjectRepository.GetAllQueryable() on epa.ProjectId equals p.ProjectId
                     join c in _unitOfWork.Clients.GetAllQueryable() on p.ClientId equals c.ClientId
-                    where epa.EmployerId == id
+                    where p.CompanyId == companyId && epa.EmployerId == id
                     group new { epa, e, p, c } by new { epa.EmployerId, e.EmployerName } into grouped
                     select new EmployerProjectAssignmentDetailDTO
                     {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TheCollabSys.Backend.API.Token;
 using TheCollabSys.Backend.Entity.DTOs;
@@ -15,12 +16,14 @@ namespace TheCollabSys.Backend.API.Controllers
         private readonly IJwtTokenGenerator _jwtTokenGenerator;
         private readonly IUserService _userService;
         private readonly IUserRoleService _userRoleService;
+        private readonly IUserCompanyService _userCompanyService;
 
-        public TokenController(IJwtTokenGenerator jwtTokenGenerator, IUserRoleService userRoleService, IUserService userService)
+        public TokenController(IJwtTokenGenerator jwtTokenGenerator, IUserRoleService userRoleService, IUserService userService, IUserCompanyService userCompanyService)
         {
             _jwtTokenGenerator = jwtTokenGenerator;
             _userRoleService = userRoleService;
             _userService = userService;
+            _userCompanyService = userCompanyService;
         }
 
         [AllowAnonymous]
@@ -56,9 +59,14 @@ namespace TheCollabSys.Backend.API.Controllers
             if (user == null) return NotFound("user not found.");
 
             var userRole = await GetUserRole(user.UserName);
+            if (userRole == null) return NotFound("user role not found.");
+
             var token = await GenerateToken(user.UserName);
 
-            return Ok(new LoginResponse { UserRole = userRole, AuthToken = token });
+            var usercompany = await GetUserCompany(user.Id);
+            if (usercompany == null) return NotFound("user company not found.");
+
+            return Ok(new LoginResponse { UserRole = userRole, AuthToken = token, UserCompany = usercompany });
         }
 
         private async Task<UserRoleDTO?> GetUserRole(string username)
@@ -69,6 +77,11 @@ namespace TheCollabSys.Backend.API.Controllers
         private async Task<AuthTokenResponse> GenerateToken(string username)
         {
             return await _jwtTokenGenerator.GenerateToken(username);
+        }
+
+        private async Task<UserCompanyDTO?> GetUserCompany(string userid)
+        {
+            return await _userCompanyService.GetByUserIdAsync(userid);
         }
     }
 }

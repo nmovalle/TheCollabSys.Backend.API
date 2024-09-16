@@ -31,9 +31,9 @@ namespace TheCollabSys.Backend.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllEmployers()
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteWithCompanyIdAsync(async (companyId) =>
             {
-                var data = await _service.GetAll().ToListAsync();
+                var data = await _service.GetAll(companyId).ToListAsync();
 
                 if (data.Any())
                     return CreateResponse("success", data, "success");
@@ -46,9 +46,9 @@ namespace TheCollabSys.Backend.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> GetEmployerById(int id)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteWithCompanyIdAsync(async (companyId) =>
             {
-                var data = await _service.GetByIdAsync(id);
+                var data = await _service.GetByIdAsync(companyId,id);
 
                 if (data == null)
                     return CreateNotFoundResponse<object>(null,"register not found");
@@ -72,12 +72,14 @@ namespace TheCollabSys.Backend.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> UpdateEmployer(int id, [FromForm] string dto, [FromForm] IFormFile? file)
         {
-            var existing = await _service.GetByIdAsync(id);
-            if (existing == null)
-                return CreateNotFoundResponse<object>(null,"register not found");
-
             return await this.HandleClientOperationAsync<EmployerDTO>(dto, file, async (model) =>
             {
+                if (model.CompanyId == null) return NotFound("Company Id is missing.");
+
+                var existing = await _service.GetByIdAsync((int)model.CompanyId, id);
+                if (existing == null)
+                    return CreateNotFoundResponse<object>(null, "register not found");
+
                 await _service.Update(id, model);
                 return NoContent();
             });
