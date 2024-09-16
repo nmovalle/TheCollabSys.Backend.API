@@ -6,8 +6,8 @@ namespace TheCollabSys.Backend.Services;
 
 public interface IProjectService
 {
-    IAsyncEnumerable<ProjectDTO> GetAll();
-    Task<ProjectDTO?> GetByIdAsync(int id);
+    IAsyncEnumerable<ProjectDTO> GetAll(int companyId);
+    Task<ProjectDTO?> GetByIdAsync(int companyId, int id);
     Task<DdProject> Create(DdProject entity);
     Task Update(int id, ProjectDTO dto);
     Task Delete(int id);

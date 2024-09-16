@@ -24,11 +24,12 @@ public class ProjectService : IProjectService
         _context = context;
     }
 
-    public IAsyncEnumerable<ProjectDTO> GetAll()
+    public IAsyncEnumerable<ProjectDTO> GetAll(int companyId)
     {
         var data = (from p in _unitOfWork.ProjectRepository.GetAllQueryable()
                     join c in _unitOfWork.Clients.GetAllQueryable()
                     on p.ClientId equals c.ClientId
+                    where p.CompanyId == companyId
                     select new ProjectDTO
                     {
                         ProjectId = p.ProjectId,
@@ -49,10 +50,10 @@ public class ProjectService : IProjectService
         return data;
     }
 
-    public async Task<ProjectDTO?> GetByIdAsync(int id)
+    public async Task<ProjectDTO?> GetByIdAsync(int companyId, int id)
     {
         var resp = await _unitOfWork.ProjectRepository.GetAllQueryable()
-        .Where(p => p.ProjectId == id)
+        .Where(p => p.CompanyId == companyId && p.ProjectId == id)
         .Join(
             _unitOfWork.Clients.GetAllQueryable(),
             project => project.ClientId,

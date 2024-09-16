@@ -18,9 +18,10 @@ public class EngineerService : IEngineerService
         _mapperService = mapperService;
     }
 
-    public IAsyncEnumerable<EngineerDTO> GetAll()
+    public IAsyncEnumerable<EngineerDTO> GetAll(int companyId)
     {
         var data = _unitOfWork.EngineerRepository.GetAllQueryable()
+            .Where(c => c.CompanyId == companyId)
             .Select(c => new EngineerDTO
             {
                 EngineerId = c.EngineerId,
@@ -43,9 +44,10 @@ public class EngineerService : IEngineerService
         return data;
     }
 
-    public IAsyncEnumerable<EngineerDTO> GetEngineersByProjectSkillsAsync(int projectId)
+    public IAsyncEnumerable<EngineerDTO> GetEngineersByProjectSkillsAsync(int companyId, int projectId)
     {
         var data = _unitOfWork.EngineerRepository.GetAllQueryable()
+            .Where(e => e.CompanyId == companyId)
             .Join(_unitOfWork.EngineerSkillRepository.GetAllQueryable(),
                   engineer => engineer.EngineerId,
                   engineerSkill => engineerSkill.EngineerId,
@@ -54,40 +56,60 @@ public class EngineerService : IEngineerService
                   combined => combined.engineerSkill.SkillId,
                   projectSkill => projectSkill.SkillId,
                   (combined, projectSkill) => new { combined.engineer, combined.engineerSkill, projectSkill })
-            .Join(_unitOfWork.ProjectRepository.GetAllQueryable(),
+            .Join(_unitOfWork.ProjectRepository.GetAllQueryable()
+            .Where(p => p.CompanyId == companyId),
                   combined => combined.projectSkill.ProjectId,
                   project => project.ProjectId,
                   (combined, project) => new { combined.engineer, project })
-            .Where(result => result.project.ProjectId == projectId)
-            .Select(result => new EngineerDTO
+            .Where(result => result.project.CompanyId == companyId &&
+                             result.engineer.CompanyId == companyId &&
+                             result.project.ProjectId == projectId)
+            .GroupBy(result => new
             {
-                EngineerId = result.engineer.EngineerId,
-                EngineerName = result.engineer.EngineerName,
-                EmployerId = result.engineer.EmployerId,
-                EmployerName = result.engineer.Employer.EmployerName,
-                FirstName = result.engineer.FirstName,
-                LastName = result.engineer.LastName,
-                Email = result.engineer.Email,
-                Phone = result.engineer.Phone,
-                Image = result.engineer.Image,
-                DateCreated = result.engineer.DateCreated,
-                IsActive = result.engineer.IsActive,
-                UserId = result.engineer.UserId,
-                DateUpdate = result.engineer.DateUpdate,
-                Filetype = result.engineer.Filetype,
+                result.engineer.EngineerId,
+                result.engineer.EngineerName,
+                result.engineer.EmployerId,
+                result.engineer.Employer.EmployerName,
+                result.engineer.FirstName,
+                result.engineer.LastName,
+                result.engineer.Email,
+                result.engineer.Phone,
+                result.engineer.Image,
+                result.engineer.DateCreated,
+                result.engineer.IsActive,
+                result.engineer.UserId,
+                result.engineer.DateUpdate,
+                result.engineer.Filetype
+            })
+            .Select(group => new EngineerDTO
+            {
+                EngineerId = group.Key.EngineerId,
+                EngineerName = group.Key.EngineerName,
+                EmployerId = group.Key.EmployerId,
+                EmployerName = group.Key.EmployerName,
+                FirstName = group.Key.FirstName,
+                LastName = group.Key.LastName,
+                Email = group.Key.Email,
+                Phone = group.Key.Phone,
+                Image = group.Key.Image,
+                DateCreated = group.Key.DateCreated,
+                IsActive = group.Key.IsActive,
+                UserId = group.Key.UserId,
+                DateUpdate = group.Key.DateUpdate,
+                Filetype = group.Key.Filetype,
                 Rating = _unitOfWork.EngineerSkillRepository.GetAllQueryable()
-                        .Where(es => es.EngineerId == result.engineer.EngineerId)
-                        .Average(es => (double?)es.LevelId) ?? 0
+                    .Where(es => es.Engineer.CompanyId == companyId && es.EngineerId == group.Key.EngineerId)
+                    .Average(es => (double?)es.LevelId) ?? 0
             })
             .AsAsyncEnumerable();
 
         return data;
     }
 
-    public async Task<EngineerDTO?> GetByIdAsync(int id)
+    public async Task<EngineerDTO?> GetByIdAsync(int companyId, int id)
     {
         var resp = await _unitOfWork.EngineerRepository.GetAllQueryable()
-            .Where(c => c.EngineerId == id)
+            .Where(c => c.CompanyId == companyId && c.EngineerId == id)
             .Select(c => new EngineerDTO
             {
                 EngineerId = c.EngineerId,

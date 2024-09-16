@@ -142,10 +142,6 @@ public abstract class BaseController : ControllerBase
                 {
                     companyIdProperty.SetValue(model, companyIdValue);
                 }
-                else
-                {
-                    throw new ArgumentException("Invalid CompanyId format or property not found.");
-                }
             }
 
             return await clientOperation(model);

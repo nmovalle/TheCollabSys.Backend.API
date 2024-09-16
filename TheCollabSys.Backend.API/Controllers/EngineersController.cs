@@ -31,9 +31,9 @@ public class EngineersController : BaseController
     [HttpGet]
     public async Task<IActionResult> GetAllEngineers()
     {
-        return await ExecuteAsync(async () =>
+        return await ExecuteWithCompanyIdAsync(async (companyId) =>
         {
-            var data = await _service.GetAll().ToListAsync();
+            var data = await _service.GetAll(companyId).ToListAsync();
 
             if (data.Any())
                 return CreateResponse("success", data, "success");
@@ -46,9 +46,9 @@ public class EngineersController : BaseController
     [Route("GetEngineersByProjectSkills/{projectId}")]
     public async Task<IActionResult> GetEngineersByProjectSkills(int projectId)
     {
-        return await ExecuteAsync(async () =>
+        return await ExecuteWithCompanyIdAsync(async (companyId) =>
         {
-            var data = await _service.GetEngineersByProjectSkillsAsync(projectId).ToListAsync();
+            var data = await _service.GetEngineersByProjectSkillsAsync(companyId, projectId).ToListAsync();
 
             if (data == null)
                 return CreateNotFoundResponse<object>(null, "register not found");
@@ -61,9 +61,9 @@ public class EngineersController : BaseController
     [Route("{id}")]
     public async Task<IActionResult> GetEngineerById(int id)
     {
-        return await ExecuteAsync(async () =>
+        return await ExecuteWithCompanyIdAsync(async (companyId) =>
         {
-            var data = await _service.GetByIdAsync(id);
+            var data = await _service.GetByIdAsync(companyId, id);
 
             if (data == null)
                 return CreateNotFoundResponse<object>(null, "register not found");
@@ -87,12 +87,15 @@ public class EngineersController : BaseController
     [Route("{id}")]
     public async Task<IActionResult> UpdateEngineer(int id, [FromForm] string dto, [FromForm] IFormFile? file)
     {
-        var existing = await _service.GetByIdAsync(id);
-        if (existing == null)
-            return CreateNotFoundResponse<object>(null, "register not found");
-
         return await this.HandleClientOperationAsync<EngineerDTO>(dto, file, async (model) =>
         {
+            if (model.CompanyId == null) return NotFound("Company Id is missing.");
+
+            var existing = await _service.GetByIdAsync((int)model.CompanyId, id);
+            if (existing == null)
+                return CreateNotFoundResponse<object>(null, "register not found");
+
+
             await _service.Update(id, model);
             return NoContent();
         });
