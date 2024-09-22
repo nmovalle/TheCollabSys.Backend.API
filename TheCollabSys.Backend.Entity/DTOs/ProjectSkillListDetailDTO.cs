@@ -1,6 +1,6 @@
 ﻿namespace TheCollabSys.Backend.Entity.DTOs;
 
-public record ProjectDTO
+public class ProjectSkillListDetailDTO
 {
     public int ProjectId { get; set; }
     public string ProjectName { get; set; } = null!;
@@ -12,8 +12,10 @@ public record ProjectDTO
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public int StatusId { get; set; }
-    public string StatusName { get; set; }
+    public string? StatusName { get; set; }
     public string? UserId { get; set; }
     public DateTime? DateUpdate { get; set; }
     public int? CompanyId { get; set; }
+
+    public List<SkillLevelDTO> Skills { get; set; }
 }

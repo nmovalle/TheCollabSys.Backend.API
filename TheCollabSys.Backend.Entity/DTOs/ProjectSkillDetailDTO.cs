@@ -13,4 +13,6 @@ public class SkillLevelDTO
     public int SkillId { get; set; }
     public string SkillName { get; set; }
     public int LevelId { get; set; }
+    public int? CategoryId { get; set; }
+    public int? SubcategoryId { get; set; }
 }

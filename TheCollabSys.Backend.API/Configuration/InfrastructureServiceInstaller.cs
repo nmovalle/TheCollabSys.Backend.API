@@ -43,6 +43,7 @@ public class InfrastructureServiceInstaller : IServiceInstaller
         services.AddScoped<IInvitationService, InvitationService>();
         services.AddScoped<IWireListService, WireListService>();
 
+        services.AddScoped<IStatusService, StatusService>();
 
         services.AddScoped(typeof(IMapperService<,>), typeof(MapperService<,>));
 

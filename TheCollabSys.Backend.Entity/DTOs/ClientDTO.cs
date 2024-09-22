@@ -2,7 +2,7 @@
 
 public class ClientDTO : IUserOwned
 {
-    public int ClientID { get; set; }
+    public int ClientId { get; set; }
     public string? ClientName { get; set; }
     public string? Address { get; set; }
     public string? Phone { get; set; }

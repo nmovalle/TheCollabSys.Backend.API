@@ -31,6 +31,7 @@ public class UnitOfWork : IUnitOfWork
     public IUserCompanyRepository UserCompanyRepository { get; private set; }
     public IInvitationRepository InvitationRepository { get; private set; }
     public IWireListRepository WireListRepository { get; private set; }
+    public IStatusRepository StatusRepository { get; private set; }
 
     public UnitOfWork(TheCollabsysContext context)
     {
@@ -61,6 +62,7 @@ public class UnitOfWork : IUnitOfWork
         UserCompanyRepository = new UserCompanyRepository(_context);
         InvitationRepository = new InvitationRepository(_context);
         WireListRepository = new WireListRepository(_context);
+        StatusRepository = new StatusRepository(_context);
     }
 
     public async Task<int> CompleteAsync()

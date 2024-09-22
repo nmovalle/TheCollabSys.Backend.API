@@ -28,7 +28,7 @@ public class ClientService : IClientService
             .Where(client => client.CompanyId == companyId)
             .Select(client => new ClientDTO
             {
-                ClientID = client.ClientId,
+                ClientId = client.ClientId,
                 ClientName = client.ClientName,
                 Address = client.Address,
                 Phone = client.Phone,
@@ -50,7 +50,7 @@ public class ClientService : IClientService
             .Where(c => c.CompanyId == companyId && c.ClientId == id)
             .Select(client => new ClientDTO
             {
-                ClientID = client.ClientId,
+                ClientId = client.ClientId,
                 ClientName = client.ClientName,
                 Address = client.Address,
                 Phone = client.Phone,

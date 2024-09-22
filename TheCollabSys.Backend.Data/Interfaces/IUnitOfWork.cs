@@ -27,6 +27,7 @@ public interface IUnitOfWork : IDisposable
     IUserCompanyRepository UserCompanyRepository { get; }
     IInvitationRepository InvitationRepository { get; }
     IWireListRepository WireListRepository { get; }
+    IStatusRepository StatusRepository { get; }
 
     Task<int> CompleteAsync();
 }
