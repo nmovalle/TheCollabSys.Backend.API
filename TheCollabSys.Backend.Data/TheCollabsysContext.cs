@@ -81,7 +81,7 @@ public partial class TheCollabsysContext : DbContext
 
     public virtual DbSet<DdProjectSoftware> DdProjectSoftwares { get; set; }
 
-    public virtual DbSet<DdProjectStatus> DdProjectStatuses { get; set; }
+    public virtual DbSet<DdStatus> DD_Status { get; set; }
 
     public virtual DbSet<DdProposalRole> DD_ProposalRoles { get; set; }
 
@@ -616,11 +616,12 @@ public partial class TheCollabsysContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
-        modelBuilder.Entity<DdProjectStatus>(entity =>
+        modelBuilder.Entity<DdStatus>(entity =>
         {
             entity.HasKey(e => e.StatusId);
 
             entity.Property(e => e.StatusName).HasMaxLength(50);
+            entity.Property(e => e.Type).HasMaxLength(25);
         });
 
         modelBuilder.Entity<DdProposalRole>(entity =>

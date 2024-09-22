@@ -27,8 +27,7 @@ public class ProjectService : IProjectService
     public IAsyncEnumerable<ProjectDTO> GetAll(int companyId)
     {
         var data = (from p in _unitOfWork.ProjectRepository.GetAllQueryable()
-                    join c in _unitOfWork.Clients.GetAllQueryable()
-                    on p.ClientId equals c.ClientId
+                    join c in _unitOfWork.Clients.GetAllQueryable() on p.ClientId equals c.ClientId
                     where p.CompanyId == companyId
                     select new ProjectDTO
                     {
@@ -42,6 +41,7 @@ public class ProjectService : IProjectService
                         StartDate = p.StartDate,
                         EndDate = p.EndDate,
                         StatusId = p.StatusId,
+                        StatusName = p.Status.StatusName,
                         UserId = p.UserId,
                         DateUpdate = p.DateUpdate,
                     })
@@ -49,6 +49,45 @@ public class ProjectService : IProjectService
 
         return data;
     }
+
+    public IAsyncEnumerable<ProjectSkillListDetailDTO> GetDetail(int companyId)
+    {
+        var data = (from ps in _unitOfWork.ProjectSkillRepository.GetAllQueryable()
+                    join p in _unitOfWork.ProjectRepository.GetAllQueryable() on ps.ProjectId equals p.ProjectId
+                    join c in _unitOfWork.Clients.GetAllQueryable() on p.ClientId equals c.ClientId
+                    join s in _unitOfWork.SkillRepository.GetAllQueryable() on ps.SkillId equals s.SkillId
+                    where p.CompanyId == companyId
+                    group new { ps, p, c, s } by new
+                    {
+                        ps.ProjectId,
+                        p.ProjectName,
+                    } into grouped
+                    select new ProjectSkillListDetailDTO
+                    {
+                        ProjectId = grouped.Key.ProjectId,
+                        ProjectName = grouped.Key.ProjectName,
+                        ProjectDescription = grouped.Select(g => g.p.ProjectDescription).FirstOrDefault(),
+                        ClientId = grouped.Select(g => g.c.ClientId).FirstOrDefault(),
+                        ClientName = grouped.Select(g => g.c.ClientName).FirstOrDefault(),
+                        NumberPositionTobeFill = grouped.Select(g => g.p.NumberPositionTobeFill).FirstOrDefault(),
+                        DateCreated = grouped.Select(g => g.p.DateCreated).FirstOrDefault(),
+                        StartDate = grouped.Select(g => g.p.StartDate).FirstOrDefault(),
+                        EndDate = grouped.Select(g => g.p.EndDate).FirstOrDefault(),
+                        StatusId = grouped.Select(g => g.p.StatusId).FirstOrDefault(),
+                        StatusName = grouped.Select(g => g.p.Status.StatusName).FirstOrDefault(),
+                        UserId = grouped.Select(g => g.p.UserId).FirstOrDefault(),
+                        DateUpdate = grouped.Select(g => g.p.DateUpdate).FirstOrDefault(),
+                        Skills = grouped.Select(g => new SkillLevelDTO
+                        {
+                            SkillId = g.s.SkillId,
+                            SkillName = g.s.SkillName,
+                            LevelId = g.ps.LevelId
+                        }).ToList()
+                    }).AsAsyncEnumerable();
+
+        return data;
+    }
+
 
     public async Task<ProjectDTO?> GetByIdAsync(int companyId, int id)
     {
@@ -69,6 +108,7 @@ public class ProjectService : IProjectService
                 DateCreated = project.DateCreated,
                 StartDate = project.StartDate,
                 EndDate = project.EndDate,
+                StatusName = project.Status.StatusName,
                 StatusId = project.StatusId,
                 UserId = project.UserId,
                 DateUpdate = project.DateUpdate,
@@ -86,7 +126,7 @@ public class ProjectService : IProjectService
         return entity;
     }
 
-    public async Task Update(int id, ProjectDTO dto)
+    public async Task<DdProject> Update(int id, ProjectDTO dto)
     {
         var existing = await _unitOfWork.ProjectRepository.GetByIdAsync(id);
         if (existing == null)
@@ -100,6 +140,7 @@ public class ProjectService : IProjectService
         _unitOfWork.ProjectRepository.Update(existing);
 
         await _unitOfWork.CompleteAsync();
+        return existing;
     }
 
     public async Task Delete(int id)

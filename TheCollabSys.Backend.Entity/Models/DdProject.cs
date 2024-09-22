@@ -45,7 +45,7 @@ public partial class DdProject
 
     public virtual ICollection<DdProjectSoftware> DdProjectSoftwares { get; set; } = new List<DdProjectSoftware>();
 
-    public virtual DdProjectStatus Status { get; set; } = null!;
+    public virtual DdStatus Status { get; set; } = null!;
 
     public virtual AspNetUser? User { get; set; }
 }

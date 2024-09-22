@@ -38,7 +38,9 @@ public class ProjectSkillService : IProjectSkillService
                         {
                             SkillId = g.s.SkillId,
                             SkillName = g.s.SkillName,
-                            LevelId = g.ps.LevelId
+                            LevelId = g.ps.LevelId,
+                            CategoryId = g.s.CategoryId,
+                            SubcategoryId = g.s.SubcategoryId
                         }).ToList()
                     }).AsAsyncEnumerable();
 
@@ -60,7 +62,9 @@ public class ProjectSkillService : IProjectSkillService
                         {
                             SkillId = g.s.SkillId,
                             SkillName = g.s.SkillName,
-                            LevelId = g.ps.LevelId
+                            LevelId = g.ps.LevelId,
+                            CategoryId = g.s.CategoryId,
+                            SubcategoryId = g.s.SubcategoryId
                         }).ToList()
                     }).FirstOrDefaultAsync();
 

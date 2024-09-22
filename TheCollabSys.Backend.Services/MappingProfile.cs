@@ -72,5 +72,8 @@ public class MappingProfile : Profile
 
         CreateMap<WireListDTO, DdWireList>();
         CreateMap<DdWireList, WireListDTO>();
+
+        CreateMap<StatusDTO, DdStatus>();
+        CreateMap<DdStatus, StatusDTO>();
     }
 }

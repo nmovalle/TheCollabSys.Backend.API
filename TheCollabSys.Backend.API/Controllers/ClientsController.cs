@@ -84,10 +84,9 @@ namespace TheCollabSys.Backend.API.Controllers
         {
             return await this.HandleClientOperationAsync<ClientDTO>(clientDTO, file, async (model) =>
             {
-                var clientEntity = _clientMapper.MapToDestination(model);
-                var savedClientEntity = await _clientService.CreateClientAsync(clientEntity);
-                var savedClientDTO = _clientMapper.MapToSource(savedClientEntity);
-                return CreatedAtAction(nameof(GetClientByIdAsync), new { id = savedClientDTO.ClientID }, savedClientDTO);
+                var entity = _clientMapper.MapToDestination(model);
+                var savedEntity = await _clientService.CreateClientAsync(entity);
+                return CreateResponse("success", savedEntity, "success");
             });
         }
 

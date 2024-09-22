@@ -43,6 +43,21 @@ public class ProjectsController : BaseController
     }
 
     [HttpGet]
+    [Route("GetDetail")]
+    public async Task<IActionResult> GetDetail()
+    {
+        return await ExecuteWithCompanyIdAsync(async (companyId) =>
+        {
+            var data = await _service.GetDetail(companyId).ToListAsync();
+
+            if (data.Any())
+                return CreateResponse("success", data, "success");
+
+            return CreateNotFoundResponse<object>(null, "Registers not founds");
+        });
+    }
+
+    [HttpGet]
     [Route("{id}")]
     public async Task<IActionResult> GetProjectById(int id)
     {
@@ -95,8 +110,8 @@ public class ProjectsController : BaseController
             if (existing == null)
                 return CreateNotFoundResponse<object>(null, "register not found");
 
-            await _service.Update(id, model);
-            return NoContent();
+            var savedEntity = await _service.Update(id, model);
+            return CreateResponse("success", savedEntity, "success");
         });
     }
 
