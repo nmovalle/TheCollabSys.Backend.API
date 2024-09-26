@@ -16,6 +16,7 @@ public class ProjectSkillListDetailDTO
     public string? UserId { get; set; }
     public DateTime? DateUpdate { get; set; }
     public int? CompanyId { get; set; }
+    public string? Folio { get; set; }
 
     public List<SkillLevelDTO> Skills { get; set; }
 }

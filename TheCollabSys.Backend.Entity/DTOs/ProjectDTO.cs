@@ -16,4 +16,5 @@ public record ProjectDTO
     public string? UserId { get; set; }
     public DateTime? DateUpdate { get; set; }
     public int? CompanyId { get; set; }
+    public string? Folio { get; set; }
 }

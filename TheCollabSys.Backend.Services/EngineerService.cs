@@ -25,7 +25,6 @@ public class EngineerService : IEngineerService
             .Select(c => new EngineerDTO
             {
                 EngineerId = c.EngineerId,
-                EngineerName = c.EngineerName,
                 EmployerId = c.EmployerId,
                 EmployerName = c.Employer.EmployerName,
                 FirstName = c.FirstName,
@@ -40,6 +39,41 @@ public class EngineerService : IEngineerService
                 UserId = c.UserId
             })
             .AsAsyncEnumerable();
+
+        return data;
+    }
+
+    public IAsyncEnumerable<EngineerSkillDetailDTO> GetDetail(int companyId)
+    {
+        var data = (from es in _unitOfWork.EngineerSkillRepository.GetAllQueryable()
+                    join e in _unitOfWork.EngineerRepository.GetAllQueryable() on es.EngineerId equals e.EngineerId
+                    join em in _unitOfWork.EmployerRepository.GetAllQueryable() on e.EmployerId equals em.EmployerId
+                    join s in _unitOfWork.SkillRepository.GetAllQueryable() on es.SkillId equals s.SkillId
+                    where e.CompanyId == companyId
+                    group new { es, e, em, s } by new
+                    {
+                        es.EngineerId,
+                    } into grouped
+                    select new EngineerSkillDetailDTO
+                    {
+                        EngineerId = grouped.Key.EngineerId,
+                        EmployerId = grouped.Select(g => g.em.EmployerId).FirstOrDefault(),
+                        EmployerName = grouped.Select(g => g.em.EmployerName).FirstOrDefault(),
+                        FirstName = grouped.Select(g => g.e.FirstName).FirstOrDefault(),
+                        LastName = grouped.Select(g => g.e.LastName).FirstOrDefault(),
+                        Email = grouped.Select(g => g.e.Email).FirstOrDefault(),
+                        Phone = grouped.Select(g => g.e.Phone).FirstOrDefault(),
+                        DateCreated = grouped.Select(g => g.e.DateCreated).FirstOrDefault(),
+                        DateUpdate = grouped.Select(g => g.e.DateUpdate).FirstOrDefault(),
+                        IsActive = grouped.Select(g => g.e.IsActive).FirstOrDefault(),
+                        UserId = grouped.Select(g => g.e.UserId).FirstOrDefault(),
+                        Skills = grouped.Select(g => new SkillLevelDTO
+                        {
+                            SkillId = g.s.SkillId,
+                            SkillName = g.s.SkillName,
+                            LevelId = g.es.LevelId
+                        }).ToList()
+                    }).AsAsyncEnumerable();
 
         return data;
     }
@@ -84,7 +118,6 @@ public class EngineerService : IEngineerService
             .Select(group => new EngineerDTO
             {
                 EngineerId = group.Key.EngineerId,
-                EngineerName = group.Key.EngineerName,
                 EmployerId = group.Key.EmployerId,
                 EmployerName = group.Key.EmployerName,
                 FirstName = group.Key.FirstName,
@@ -113,7 +146,6 @@ public class EngineerService : IEngineerService
             .Select(c => new EngineerDTO
             {
                 EngineerId = c.EngineerId,
-                EngineerName = c.EngineerName,
                 EmployerId = c.EmployerId,
                 EmployerName = c.Employer.EmployerName,
                 FirstName = c.FirstName,
@@ -140,7 +172,7 @@ public class EngineerService : IEngineerService
         return entity;
     }
 
-    public async Task Update(int id, EngineerDTO dto)
+    public async Task<DdEngineer> Update(int id, EngineerDTO dto)
     {
         var existing = await _unitOfWork.EngineerRepository.GetByIdAsync(id);
         if (existing == null)
@@ -154,6 +186,7 @@ public class EngineerService : IEngineerService
         _unitOfWork.EngineerRepository.Update(existing);
 
         await _unitOfWork.CompleteAsync();
+        return existing;
     }
 
     public async Task Delete(int id)

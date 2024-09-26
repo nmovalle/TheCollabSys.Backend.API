@@ -4,10 +4,8 @@ public class EngineerDTO
 {
     public int EngineerId { get; set; }
 
-    public string EngineerName { get; set; } = null!;
-
     public int EmployerId { get; set; }
-    public string? EmployerName { get; set; }
+    public string? EmployerName { get; set; } = string.Empty!;
 
     public string? FirstName { get; set; }
 

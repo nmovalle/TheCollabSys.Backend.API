@@ -25,6 +25,8 @@ public partial class DdProject
 
     public int? CompanyId { get; set; }
 
+    public string? Folio { get; set; }
+
     public virtual DdClient Client { get; set; } = null!;
 
     public virtual DdCompany? Company { get; set; }
