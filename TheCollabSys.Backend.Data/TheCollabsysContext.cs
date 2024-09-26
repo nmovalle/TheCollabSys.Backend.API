@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Reflection.Metadata;
 using TheCollabSys.Backend.Entity.Models;
 
 namespace TheCollabSys.Backend.Data;
@@ -530,6 +531,10 @@ public partial class TheCollabsysContext : DbContext
             entity.Property(e => e.DateCreated);
             entity.Property(e => e.DateUpdate);
             entity.Property(e => e.EndDate);
+
+            entity.Property(e => e.Folio)
+                .ValueGeneratedNever();
+
             entity.Property(e => e.ProjectDescription);
             entity.Property(e => e.ProjectName).HasMaxLength(255);
             entity.Property(e => e.StartDate);
@@ -549,7 +554,10 @@ public partial class TheCollabsysContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.User).WithMany(p => p.DdProjects)
-                .HasForeignKey(d => d.UserId);
+            .HasForeignKey(d => d.UserId);
+
+            modelBuilder.Entity<DdProject>()
+            .ToTable(tb => tb.HasTrigger("trg_GenerateFolio"));
         });
 
         modelBuilder.Entity<DdProjectAssignment>(entity =>

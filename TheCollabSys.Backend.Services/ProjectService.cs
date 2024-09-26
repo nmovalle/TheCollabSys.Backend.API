@@ -44,6 +44,7 @@ public class ProjectService : IProjectService
                         StatusName = p.Status.StatusName,
                         UserId = p.UserId,
                         DateUpdate = p.DateUpdate,
+                        Folio = p.Folio
                     })
             .AsAsyncEnumerable();
 
@@ -77,6 +78,7 @@ public class ProjectService : IProjectService
                         StatusName = grouped.Select(g => g.p.Status.StatusName).FirstOrDefault(),
                         UserId = grouped.Select(g => g.p.UserId).FirstOrDefault(),
                         DateUpdate = grouped.Select(g => g.p.DateUpdate).FirstOrDefault(),
+                        Folio = grouped.Select(g => g.p.Folio).FirstOrDefault(),
                         Skills = grouped.Select(g => new SkillLevelDTO
                         {
                             SkillId = g.s.SkillId,
@@ -112,6 +114,7 @@ public class ProjectService : IProjectService
                 StatusId = project.StatusId,
                 UserId = project.UserId,
                 DateUpdate = project.DateUpdate,
+                Folio = project.Folio
             })
         .FirstOrDefaultAsync();
 
@@ -134,7 +137,7 @@ public class ProjectService : IProjectService
 
         dto.DateUpdate = DateTime.Now;
 
-        var excludeProperties = new List<string> { "DateCreated" };
+        var excludeProperties = new List<string> { "DateCreated", "Folio" };
         _mapperService.Map(dto, existing, excludeProperties);
 
         _unitOfWork.ProjectRepository.Update(existing);

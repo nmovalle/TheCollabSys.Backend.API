@@ -3,7 +3,7 @@ public partial class DdEngineer
 {
     public int EngineerId { get; set; }
 
-    public string EngineerName { get; set; } = null!;
+    public string EngineerName { get; set; } = string.Empty!;
 
     public int EmployerId { get; set; }
 

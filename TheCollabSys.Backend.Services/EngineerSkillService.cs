@@ -27,7 +27,6 @@ public class EngineerSkillService : IEngineerSkillService
                     select new EngineerSkillDetailDTO
                     {
                         EngineerId = grouped.Key.EngineerId,
-                        EngineerName = grouped.Key.EngineerName,
                         FirstName = grouped.Key.FirstName,
                         LastName = grouped.Key.LastName,
                         Skills = grouped.Select(g => new SkillLevelDTO
@@ -51,7 +50,6 @@ public class EngineerSkillService : IEngineerSkillService
                     select new EngineerSkillDetailDTO
                     {
                         EngineerId = grouped.Key.EngineerId,
-                        EngineerName = grouped.Key.EngineerName,
                         FirstName = grouped.Key.FirstName,
                         LastName = grouped.Key.LastName,
                         Skills = grouped.Select(g => new SkillLevelDTO
