@@ -18,13 +18,16 @@ namespace TheCollabSys.Backend.API.Controllers;
 public class ProjectsController : BaseController
 {
     private readonly IProjectService _service;
+    private readonly IProjectSkillService _serviceSkills;
     private readonly IMapperService<ProjectDTO, DdProject> _mapper;
     public ProjectsController(
         IProjectService service,
+        IProjectSkillService serviceSkills,
         IMapperService<ProjectDTO, DdProject> mapperService
         )
     {
         _service = service;
+        _serviceSkills = serviceSkills;
         _mapper = mapperService;
     }
 
@@ -121,6 +124,7 @@ public class ProjectsController : BaseController
     {
         try
         {
+            await _serviceSkills.Delete(id);
             await _service.Delete(id);
             return NoContent();
         }

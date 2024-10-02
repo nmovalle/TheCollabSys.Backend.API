@@ -18,13 +18,16 @@ namespace TheCollabSys.Backend.API.Controllers;
 public class EngineersController : BaseController
 {
     private readonly IEngineerService _service;
+    private readonly IEngineerSkillService _serviceSkills;
     private readonly IMapperService<EngineerDTO, DdEngineer> _mapper;
     public EngineersController(
         IEngineerService service,
+        IEngineerSkillService serviceSkills,
         IMapperService<EngineerDTO, DdEngineer> mapperService
         )
     {
         _service = service;
+        _serviceSkills = serviceSkills;
         _mapper = mapperService;
     }
 
@@ -121,6 +124,7 @@ public class EngineersController : BaseController
     {
         try
         {
+            await _serviceSkills.Delete(id);
             await _service.Delete(id);
             return NoContent();
         }
