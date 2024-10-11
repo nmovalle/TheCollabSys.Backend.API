@@ -39,6 +39,29 @@ public class EmployerService : IEmployerService
         return data;
     }
 
+    public async Task<EmployerDTO> GetOldestEmployerAsync(int companyId)
+    {
+        var oldestEmployer = await _unitOfWork.EmployerRepository.GetAllQueryable()
+            .Where(c => c.CompanyId == companyId)
+            .OrderBy(c => c.DateCreated)
+            .Select(c => new EmployerDTO
+            {
+                EmployerId = c.EmployerId,
+                EmployerName = c.EmployerName,
+                Address = c.Address,
+                Phone = c.Phone,
+                Image = c.Image,
+                Filetype = c.Filetype,
+                DateCreated = c.DateCreated,
+                DateUpdate = c.DateUpdate,
+                Active = c.Active
+            })
+            .FirstOrDefaultAsync();
+
+        return oldestEmployer;
+    }
+
+
     public async Task<EmployerDTO?> GetByIdAsync(int companyId, int id)
     {
         var resp = await _unitOfWork.EmployerRepository.GetAllQueryable()

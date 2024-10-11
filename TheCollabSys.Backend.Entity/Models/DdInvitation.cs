@@ -15,4 +15,8 @@ public partial class DdInvitation
     public string? Permissions { get; set; }
 
     public bool IsExternal { get; set; }
+
+    public int? CompanyId { get; set; }
+
+    public string? UserId { get; set; }
 }

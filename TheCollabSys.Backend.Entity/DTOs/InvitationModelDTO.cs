@@ -25,4 +25,8 @@ public class InvitationModelDTO
     public string RoleName { get; set; }
 
     public bool IsBlackList { get; set; }
+
+    public int? CompanyId { get; set; }
+
+    public string? UserId { get; set; }
 }

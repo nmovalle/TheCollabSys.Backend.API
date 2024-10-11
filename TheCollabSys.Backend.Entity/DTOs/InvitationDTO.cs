@@ -15,4 +15,8 @@ public class InvitationDTO
     public string? Permissions { get; set; }
 
     public bool IsExternal { get; set; }
+
+    public int? CompanyId { get; set; }
+
+    public string? UserId { get; set; }
 }

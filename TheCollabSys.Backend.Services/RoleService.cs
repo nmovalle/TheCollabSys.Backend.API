@@ -1,4 +1,6 @@
-﻿using TheCollabSys.Backend.Data.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.Design;
+using TheCollabSys.Backend.Data.Interfaces;
 using TheCollabSys.Backend.Entity.DTOs;
 using TheCollabSys.Backend.Entity.Models;
 
@@ -24,8 +26,17 @@ public class RoleService : IRoleService
 
     public async Task<RoleDTO?> GetRoleByIdAsync(string id)
     {
-        var entity = await _unitOfWork.RoleRepository.GetByIdAsync(id);
-        return _mapperService.MapToSource(entity);
+        var resp = await _unitOfWork.RoleRepository.GetAllQueryable()
+            .Where(c => c.Id == id)
+            .Select(c => new RoleDTO
+            {
+             Id = c.Id,
+             Name = c.Name,
+             NormalizedName = c.NormalizedName
+            })
+            .FirstOrDefaultAsync();
+
+        return resp;
     }
 
     public async Task<RoleDTO?> GetRoleByNameAsync(string name)

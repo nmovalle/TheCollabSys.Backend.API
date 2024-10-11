@@ -2,7 +2,9 @@
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic.FileIO;
 using Newtonsoft.Json;
+using System;
 using System.ComponentModel.Design;
 using System.Numerics;
 using TheCollabSys.Backend.API.Extensions;
@@ -13,6 +15,7 @@ using TheCollabSys.Backend.Entity.Models;
 using TheCollabSys.Backend.Entity.Request;
 using TheCollabSys.Backend.Entity.Response;
 using TheCollabSys.Backend.Services;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace TheCollabSys.Backend.API.Controllers;
 
@@ -29,6 +32,9 @@ public class InvitationController : BaseController
     private readonly IUserRoleService _userRoleService;
     private readonly IUserCompanyService _userCompanyService;
     private readonly ICompanyService _companyService;
+    private readonly IRoleService _roleService;
+    private readonly IEmployerService _employerService;
+    private readonly IEngineerService _engineerService;
 
     private readonly IConfiguration _configuration;
     private readonly IEmailService _emailService;
@@ -41,6 +47,9 @@ public class InvitationController : BaseController
         IUserRoleService userRoleService,
         IUserCompanyService userCompanyService,
         ICompanyService companyService,
+        IRoleService roleService,
+        IEmployerService employerService,
+        IEngineerService engineerService,
 
         IConfiguration configuration,
         IEmailService emailService,
@@ -54,6 +63,9 @@ public class InvitationController : BaseController
         _userRoleService = userRoleService;
         _userCompanyService = userCompanyService;
         _companyService = companyService;
+        _roleService = roleService;
+        _employerService = employerService;
+        _engineerService = engineerService;
 
         _configuration = configuration;
         _emailService = emailService;
@@ -64,14 +76,14 @@ public class InvitationController : BaseController
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        return await ExecuteAsync(() =>
+        return await ExecuteWithCompanyIdAsync((companyId) =>
         {
-            var data = _service.GetAll();
+            var data = _service.GetAll(companyId);
 
             if (data.Any())
                 return Task.FromResult(CreateResponse("success", data, "success"));
 
-            return Task.FromResult(CreateNotFoundResponse<object>(null, "Registers not founds"));
+            return Task.FromResult(CreateNotFoundResponse<object>(null, "Registers not found"));
         });
     }
 
@@ -79,14 +91,14 @@ public class InvitationController : BaseController
     [Route("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        return await ExecuteAsync(async () =>
+        return await ExecuteWithCompanyIdAsync((companyId) =>
         {
-            var data = await _service.GetByIdAsync(id);
+            var data = _service.GetByIdAsync(id, companyId);
 
             if (data == null)
-                return CreateNotFoundResponse<object>(null, "register not found");
+                return Task.FromResult(CreateNotFoundResponse<object>(null, "register not found"));
 
-            return CreateResponse("success", data, "success");
+            return Task.FromResult(CreateResponse("success", data, "success"));
         });
     }
 
@@ -105,7 +117,10 @@ public class InvitationController : BaseController
     [Route("generate")]
     public async Task<IActionResult> GenerateInitiation([FromBody] InvitationRequest request)
     {
-        var invitation = GenerateInvitation(request.Email, request.IsExternal);
+        var userId = HttpContext.Request.Headers["User-Id"].ToString();
+        var companyId = HttpContext.Request.Headers["Company-Id"].ToString();
+        int.TryParse(companyId, out int companyIdInt);
+        var invitation = GenerateInvitation(request.Email, request.IsExternal, companyIdInt, userId);
         var savedInvitation = await CreateOrUpdateEntityAsync<InvitationDTO, DdInvitation>(
             request.Email,
             async (email) => await _service.GetByEmail(email),
@@ -172,7 +187,7 @@ public class InvitationController : BaseController
                 return NotFound("Wire List not found.");
             }
 
-            var (user, success, password) = await UpdateOrCreateUser(invitation.Email, invitation.IsExternal, wireList.RoleId);
+            var (user, success, password) = await UpdateOrCreateUser(invitation.Email, invitation.IsExternal, wireList.RoleId, wireList.Domain);
 
             if (!success || user == null)
             {
@@ -214,12 +229,14 @@ public class InvitationController : BaseController
     [Route("{id}")]
     public async Task<IActionResult> Update(int id, [FromForm] string dto)
     {
-        var existing = await _service.GetByIdAsync(id);
-        if (existing == null)
-            return NotFound("Register not found");
-
-        return await HandleClientOperationAsync<InvitationDTO>(dto, null, async (model) =>
+        return await this.HandleClientOperationAsync<InvitationDTO>(dto, null, async (model) =>
         {
+            if (model.CompanyId == null) return NotFound("Company Id is missing.");
+
+            var existingClient = await _service.GetByIdAsync((int)model.CompanyId, id);
+            if (existingClient == null) return NotFound();
+
+
             await _service.Update(id, model);
             return NoContent();
         });
@@ -370,7 +387,7 @@ public class InvitationController : BaseController
     /// <summary>
     /// Genera una invitación.
     /// </summary>
-    private InvitationDTO GenerateInvitation(string email, bool isExternal)
+    private InvitationDTO GenerateInvitation(string email, bool isExternal, int companyId, string userId)
     {
         return new InvitationDTO
         {
@@ -378,7 +395,9 @@ public class InvitationController : BaseController
             Token = Guid.NewGuid(),
             ExpirationDate = DateTime.UtcNow.AddMinutes(5),
             Status = (int)InvitationStatus.Pending,
-            IsExternal = isExternal
+            IsExternal = isExternal,
+            CompanyId = companyId,
+            UserId = userId
         };
     }
 
@@ -415,7 +434,7 @@ public class InvitationController : BaseController
     /// <summary>
     /// Actualiza o crea un usuario basado en la invitación.
     /// </summary>
-    private async Task<(UserDTO? User, bool Success, string? Password)> UpdateOrCreateUser(string email, bool isExternal, int roleId)
+    private async Task<(UserDTO? User, bool Success, string? Password)> UpdateOrCreateUser(string email, bool isExternal, int roleId, string domain)
     {
         string? password = null;
 
@@ -441,7 +460,7 @@ public class InvitationController : BaseController
                 return (null, false, null);
             }
 
-            var company = await GetCompany(email);
+            var company = await GetCompany(domain);
             if (company == null)
             {
                 return (null, false, null);
@@ -451,6 +470,35 @@ public class InvitationController : BaseController
             if (userCompanyCreated == null)
             {
                 return (null, false, null);
+            }
+
+            //validate if is EMPLOYEROWNER to create a new register
+            var role = await GetRole(newUserRole.RoleId);
+            if (role == null)
+            {
+                return (null, false, null);
+            }
+
+            if (role.NormalizedName == "EMPLOYEROWNER" || role.NormalizedName == "MEMBEROWNER" || role.NormalizedName == "MEMBER")
+            {
+                var member = await AddNewMember(company);
+                if (member == null)
+                {
+                    return (null, false, null);
+                }
+            }
+            if (role.NormalizedName == "ENGINEER")
+            {
+                var realMember = await GetRealMember(company.CompanyId);
+                if (realMember == null)
+                {
+                    return (null, false, null);
+                }
+                var engineer = await AddNewEngineer(user.Email, company, realMember);
+                if (engineer == null)
+                {
+                    return (null, false, null);
+                }
             }
         }
         else if (isExternal)
@@ -477,10 +525,18 @@ public class InvitationController : BaseController
         return await _userService.GetUserByName(email);
     }
 
-    private async Task<CompanyDTO?> GetCompany(string email)
+    private async Task<CompanyDTO?> GetCompany(string domain)
     {
-        string domain = email.Split('@')[1];
+        //string domain = email.Split('@')[1];
         return await _companyService.GetByIdDomainAsync(domain);
+    }
+    private async Task<RoleDTO?> GetRole(string id)
+    {
+        return await _roleService.GetRoleByIdAsync(id);
+    }
+    private async Task<EmployerDTO?> GetRealMember(int company)
+    {
+        return await _employerService.GetOldestEmployerAsync(company);
     }
 
     /// <summary>
@@ -524,6 +580,34 @@ public class InvitationController : BaseController
         };
 
         return await _userCompanyService.Create(userCompany);
+    }
+    private async Task<DdEmployer?> AddNewMember(CompanyDTO company)
+    {
+        var newEmployer = new DdEmployer
+        {
+            EmployerName = company.FullName,
+            Address = company.Address,
+            Phone = company.Phone,
+            DateCreated = DateTime.Now,
+            Image = company.Logo,
+            Filetype = company.FileType,
+            Active = true,
+            CompanyId = company.CompanyId
+        };
+
+        return await _employerService.Create(newEmployer);
+    }
+    private async Task<DdEngineer?> AddNewEngineer(string email, CompanyDTO company, EmployerDTO member)
+    {
+        var newEngineer = new DdEngineer
+        {
+            EmployerId = member.EmployerId,
+            Email = email,
+            CompanyId = company.CompanyId,
+            IsActive = true,
+        };
+
+        return await _engineerService.Create(newEngineer);
     }
 
     private async Task UpdateInvitationAsync(DdInvitation existingEntity, InvitationDTO newValues)

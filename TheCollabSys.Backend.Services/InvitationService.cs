@@ -17,12 +17,13 @@ public class InvitationService : IInvitationService
         _mapperService = mapperService;
     }
 
-    public IEnumerable<InvitationModelDTO> GetAll()
+    public IEnumerable<InvitationModelDTO> GetAll(int companyId)
     {
         var resp = (from i in _unitOfWork.InvitationRepository.GetAllQueryable()
                     join w in _unitOfWork.WireListRepository.GetAllQueryable() on i.Email equals w.Email
                     join r in _unitOfWork.RoleRepository.GetAllQueryable() on w.RoleId.ToString() equals r.Id
-                    group new { i, w, r } by new { i.Id, i.Email, i.Token, i.ExpirationDate, i.Status, i.Permissions, i.IsExternal, w.Domain, w.RoleId, r.Name, w.IsBlackList } into grouped
+                    where i.CompanyId == companyId
+                    group new { i, w, r } by new { i.Id, i.Email, i.Token, i.ExpirationDate, i.Status, i.Permissions, i.IsExternal, w.Domain, w.RoleId, r.Name, w.IsBlackList, i.CompanyId, i.UserId } into grouped
                     select new
                     {
                         grouped.Key.Id,
@@ -36,6 +37,8 @@ public class InvitationService : IInvitationService
                         grouped.Key.RoleId,
                         grouped.Key.Name,
                         grouped.Key.IsBlackList,
+                        grouped.Key.CompanyId,
+                        grouped.Key.UserId,
                     }).AsEnumerable()
                     .Select(grouped => new InvitationModelDTO
                     {
@@ -51,19 +54,21 @@ public class InvitationService : IInvitationService
                         RoleId = grouped.RoleId,
                         RoleName = grouped.Name,
                         IsBlackList = grouped.IsBlackList,
+                        CompanyId = grouped.CompanyId,
+                        UserId = grouped.UserId,
                     })
                     .ToList();
 
         return resp;
     }
 
-    public async Task<InvitationModelDTO?> GetByIdAsync(int id)
+    public async Task<InvitationModelDTO?> GetByIdAsync(int id, int companyId)
     {
         var resp = await (from i in _unitOfWork.InvitationRepository.GetAllQueryable()
                           join w in _unitOfWork.WireListRepository.GetAllQueryable() on i.Email equals w.Email
                           join r in _unitOfWork.RoleRepository.GetAllQueryable() on w.RoleId.ToString() equals r.Id
-                          where i.Id == id
-                          group new { i, w, r } by new { i.Id, i.Email, i.Token, i.ExpirationDate, i.Status, i.Permissions, i.IsExternal, w.Domain, w.RoleId, r.Name, w.IsBlackList } into grouped
+                          where i.Id == id && i.CompanyId == companyId
+                          group new { i, w, r } by new { i.Id, i.Email, i.Token, i.ExpirationDate, i.Status, i.Permissions, i.IsExternal, w.Domain, w.RoleId, r.Name, w.IsBlackList, i.CompanyId, i.UserId } into grouped
                           select new InvitationModelDTO
                           {
                               Id = grouped.Key.Id,
@@ -77,6 +82,8 @@ public class InvitationService : IInvitationService
                               RoleId = grouped.Key.RoleId,
                               RoleName = grouped.Key.Name,
                               IsBlackList = grouped.Key.IsBlackList,
+                              CompanyId = grouped.Key.CompanyId,
+                              UserId = grouped.Key.UserId,
                           }).FirstOrDefaultAsync();
 
         if (resp != null)
