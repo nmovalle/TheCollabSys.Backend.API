@@ -5,8 +5,8 @@ namespace TheCollabSys.Backend.Services;
 
 public interface IInvitationService
 {
-    IEnumerable<InvitationModelDTO> GetAll();
-    Task<InvitationModelDTO?> GetByIdAsync(int id);
+    IAsyncEnumerable<InvitationModelDTO> GetAll(int companyId);
+    Task<InvitationModelDTO?> GetByIdAsync(int id, int companyId);
     Task<DdInvitation> Create(DdInvitation entity);
     Task Update(int id, InvitationDTO dto);
     Task Delete(int id);

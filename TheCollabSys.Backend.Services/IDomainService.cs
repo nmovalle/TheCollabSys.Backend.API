@@ -8,5 +8,6 @@ public interface IDomainService
     IAsyncEnumerable<DomainMasterDTO> GetAll();
     Task<DomainMasterDTO?> GetByIdAsync(int id);
     Task<DomainMasterDTO?> GetByDomainAsync(string domain);
+    Task<DomainMasterDTO?> GetByUsername(string username);
     Task<DdDomainMaster> Create(DdDomainMaster entity);
 }

@@ -45,14 +45,18 @@ public class EngineerService : IEngineerService
 
     public IAsyncEnumerable<EngineerSkillDetailDTO> GetDetail(int companyId)
     {
-        var data = (from es in _unitOfWork.EngineerSkillRepository.GetAllQueryable()
-                    join e in _unitOfWork.EngineerRepository.GetAllQueryable() on es.EngineerId equals e.EngineerId
+        var data = (from e in _unitOfWork.EngineerRepository.GetAllQueryable()
                     join em in _unitOfWork.EmployerRepository.GetAllQueryable() on e.EmployerId equals em.EmployerId
-                    join s in _unitOfWork.SkillRepository.GetAllQueryable() on es.SkillId equals s.SkillId
+                    // Left join con EngineerSkill
+                    join es in _unitOfWork.EngineerSkillRepository.GetAllQueryable() on e.EngineerId equals es.EngineerId into esGroup
+                    from es in esGroup.DefaultIfEmpty()
+                        // Left join con Skill
+                    join s in _unitOfWork.SkillRepository.GetAllQueryable() on es.SkillId equals s.SkillId into sGroup
+                    from s in sGroup.DefaultIfEmpty()
                     where e.CompanyId == companyId
                     group new { es, e, em, s } by new
                     {
-                        es.EngineerId,
+                        e.EngineerId,
                     } into grouped
                     select new EngineerSkillDetailDTO
                     {
@@ -69,10 +73,10 @@ public class EngineerService : IEngineerService
                         UserId = grouped.Select(g => g.e.UserId).FirstOrDefault(),
                         Skills = grouped.Select(g => new SkillLevelDTO
                         {
-                            SkillId = g.s.SkillId,
-                            SkillName = g.s.SkillName,
-                            LevelId = g.es.LevelId
-                        }).ToList()
+                            SkillId = g.s != null ? g.s.SkillId : 0,
+                            SkillName = g.s != null ? g.s.SkillName : string.Empty,
+                            LevelId = g.es != null ? g.es.LevelId : 0
+                        }).Where(skill => skill.SkillId != 0 || !string.IsNullOrEmpty(skill.SkillName)).ToList()
                     }).AsAsyncEnumerable();
 
         return data;

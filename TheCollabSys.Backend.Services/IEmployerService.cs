@@ -7,6 +7,7 @@ public interface IEmployerService
 {
     IAsyncEnumerable<EmployerDTO> GetAll(int companyId);
     Task<EmployerDTO?> GetByIdAsync(int companyId, int id);
+    Task<EmployerDTO> GetOldestEmployerAsync(int companyId);
     Task<DdEmployer> Create(DdEmployer entity);
     Task Update(int id, EmployerDTO dto);
     Task Delete(int id);

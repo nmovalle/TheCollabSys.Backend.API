@@ -70,6 +70,21 @@ public class DomainController : BaseController
         });
     }
 
+    [HttpGet]
+    [Route("GetByUsername/{username}")]
+    public async Task<IActionResult> GetByUsername(string username)
+    {
+        return await ExecuteAsync(async () =>
+        {
+            var data = await _service.GetByUsername(username);
+
+            if (data == null)
+                return CreateNotFoundResponse<object>(null, "register not found");
+
+            return CreateResponse("success", data, "success");
+        });
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateDomain([FromForm] string dto)
     {
