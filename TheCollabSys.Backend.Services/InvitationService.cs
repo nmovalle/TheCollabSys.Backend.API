@@ -17,9 +17,9 @@ public class InvitationService : IInvitationService
         _mapperService = mapperService;
     }
 
-    public IEnumerable<InvitationModelDTO> GetAll(int companyId)
+    public async IAsyncEnumerable<InvitationModelDTO> GetAll(int companyId)
     {
-        var resp = (from i in _unitOfWork.InvitationRepository.GetAllQueryable()
+        var query = from i in _unitOfWork.InvitationRepository.GetAllQueryable()
                     join w in _unitOfWork.WireListRepository.GetAllQueryable() on i.Email equals w.Email
                     join r in _unitOfWork.RoleRepository.GetAllQueryable() on w.RoleId.ToString() equals r.Id
                     where i.CompanyId == companyId
@@ -39,28 +39,30 @@ public class InvitationService : IInvitationService
                         grouped.Key.IsBlackList,
                         grouped.Key.CompanyId,
                         grouped.Key.UserId,
-                    }).AsEnumerable()
-                    .Select(grouped => new InvitationModelDTO
-                    {
-                        Id = grouped.Id,
-                        Email = grouped.Email,
-                        Token = grouped.Token,
-                        ExpirationDate = grouped.ExpirationDate,
-                        Status = grouped.Status,
-                        StatusName = Enum.GetName(typeof(InvitationStatus), grouped.Status),
-                        Permissions = grouped.Permissions,
-                        IsExternal = grouped.IsExternal,
-                        Domain = grouped.Domain,
-                        RoleId = grouped.RoleId,
-                        RoleName = grouped.Name,
-                        IsBlackList = grouped.IsBlackList,
-                        CompanyId = grouped.CompanyId,
-                        UserId = grouped.UserId,
-                    })
-                    .ToList();
+                    };
 
-        return resp;
+        await foreach (var grouped in query.AsAsyncEnumerable())
+        {
+            yield return new InvitationModelDTO
+            {
+                Id = grouped.Id,
+                Email = grouped.Email,
+                Token = grouped.Token,
+                ExpirationDate = grouped.ExpirationDate,
+                Status = grouped.Status,
+                StatusName = Enum.GetName(typeof(InvitationStatus), grouped.Status),
+                Permissions = grouped.Permissions,
+                IsExternal = grouped.IsExternal,
+                Domain = grouped.Domain,
+                RoleId = grouped.RoleId,
+                RoleName = grouped.Name,
+                IsBlackList = grouped.IsBlackList,
+                CompanyId = grouped.CompanyId,
+                UserId = grouped.UserId,
+            };
+        }
     }
+
 
     public async Task<InvitationModelDTO?> GetByIdAsync(int id, int companyId)
     {

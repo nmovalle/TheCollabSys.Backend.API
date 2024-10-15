@@ -4,7 +4,7 @@ namespace TheCollabSys.Backend.Services;
 
 public interface IRoleService
 {
-    Task<IEnumerable<RoleDTO>> GetAllRolesAsync();
-    Task<RoleDTO?> GetRoleByIdAsync(string id);
+    IAsyncEnumerable<RoleDTO> GetAll();
+    Task<RoleDTO?> GetByIdAsync(string id);
     Task<RoleDTO?> GetRoleByNameAsync(string name);
 }

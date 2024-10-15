@@ -76,14 +76,14 @@ public class InvitationController : BaseController
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        return await ExecuteWithCompanyIdAsync((companyId) =>
+        return await ExecuteWithCompanyIdAsync(async (companyId) =>
         {
-            var data = _service.GetAll(companyId);
+            var data = await _service.GetAll(companyId).ToListAsync();
 
             if (data.Any())
-                return Task.FromResult(CreateResponse("success", data, "success"));
+                return CreateResponse("success", data, "success");
 
-            return Task.FromResult(CreateNotFoundResponse<object>(null, "Registers not found"));
+            return CreateNotFoundResponse<object>(null, "Registers not found");
         });
     }
 
@@ -91,14 +91,14 @@ public class InvitationController : BaseController
     [Route("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        return await ExecuteWithCompanyIdAsync((companyId) =>
+        return await ExecuteWithCompanyIdAsync(async (companyId) =>
         {
-            var data = _service.GetByIdAsync(id, companyId);
+            var data = await _service.GetByIdAsync(id, companyId);
 
             if (data == null)
-                return Task.FromResult(CreateNotFoundResponse<object>(null, "register not found"));
+                return CreateNotFoundResponse<object>(null, "register not found");
 
-            return Task.FromResult(CreateResponse("success", data, "success"));
+            return CreateResponse("success", data, "success");
         });
     }
 
@@ -532,7 +532,7 @@ public class InvitationController : BaseController
     }
     private async Task<RoleDTO?> GetRole(string id)
     {
-        return await _roleService.GetRoleByIdAsync(id);
+        return await _roleService.GetByIdAsync(id);
     }
     private async Task<EmployerDTO?> GetRealMember(int company)
     {

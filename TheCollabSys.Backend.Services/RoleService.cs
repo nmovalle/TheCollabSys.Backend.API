@@ -16,15 +16,21 @@ public class RoleService : IRoleService
         _mapperService = mapperService;
     }
 
-    public async Task<IEnumerable<RoleDTO>> GetAllRolesAsync()
+    public IAsyncEnumerable<RoleDTO> GetAll()
     {
-        var roles = await _unitOfWork.RoleRepository.GetAllAsync();
-        var dto = roles.Select(_mapperService.MapToSource).ToList();
+        var data = _unitOfWork.RoleRepository.GetAllQueryable()
+            .Select(c => new RoleDTO
+            {
+                Id = c.Id,
+                Name = c.Name,
+                NormalizedName = c.NormalizedName
+            })
+            .AsAsyncEnumerable();
 
-        return dto;
+        return data;
     }
 
-    public async Task<RoleDTO?> GetRoleByIdAsync(string id)
+    public async Task<RoleDTO?> GetByIdAsync(string id)
     {
         var resp = await _unitOfWork.RoleRepository.GetAllQueryable()
             .Where(c => c.Id == id)
