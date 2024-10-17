@@ -1,6 +1,7 @@
 ﻿using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TheCollabSys.Backend.API.Extensions;
 using TheCollabSys.Backend.API.Filters;
 using TheCollabSys.Backend.API.Token;
 using TheCollabSys.Backend.Entity.DTOs;
@@ -14,7 +15,7 @@ namespace TheCollabSys.Backend.API.Controllers
     [ApiController]
     [ServiceFilter(typeof(GlobalExceptionFilter))]
     [ServiceFilter(typeof(ModelStateFilter))]
-    public class UserRoleController : ControllerBase
+    public class UserRoleController : BaseController
     {
         private readonly ILogger<UserRoleController> _logger;
         private readonly IUserRoleService _userRoleService;
@@ -29,6 +30,35 @@ namespace TheCollabSys.Backend.API.Controllers
             _userCompanyService = userCompanyService;
             _mapperService = mapperService;
             _jwtTokenGenerator = jwtTokenGenerator;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            return await ExecuteWithCompanyIdAsync(async (companyId) =>
+            {
+                var data = await _userRoleService.GetAll(companyId).ToListAsync();
+
+                if (data.Any())
+                    return CreateResponse("success", data, "success");
+
+                return CreateNotFoundResponse<object>(null, "Registers not founds");
+            });
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<IActionResult> GetById(string id)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var data = await _userRoleService.GetByIdAsync(id);
+
+                if (data == null)
+                    return CreateNotFoundResponse<object>(null, "register not found");
+
+                return CreateResponse("success", data, "success");
+            });
         }
 
         [HttpPost]
@@ -82,6 +112,32 @@ namespace TheCollabSys.Backend.API.Controllers
         private async Task<UserCompanyDTO?> GetUserCompany(string userid)
         {
             return await _userCompanyService.GetByUserIdAsync(userid);
+        }
+
+        [HttpPut]
+        [Route("{id}")]
+        public async Task<IActionResult> Update(string id, [FromForm] string dto)
+        {
+            return await HandleClientOperationAsync<UserRoleDTO>(dto, null, async (model) =>
+            {
+                await _userRoleService.UpdateUserRoleByUserName(model.Email, model.RoleId);
+                return NoContent();
+            });
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<IActionResult> DeleteMenu(string id)
+        {
+            try
+            {
+                await _userRoleService.Delete(id);
+                return NoContent();
+            }
+            catch (ArgumentException ex)
+            {
+                return CreateNotFoundResponse<object>(null, "register not found");
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using TheCollabSys.Backend.Data.Interfaces;
 using TheCollabSys.Backend.Entity.DTOs;
 using TheCollabSys.Backend.Entity.Models;
@@ -16,18 +17,51 @@ public class UserService : IUserService
         _userMapper = userMapper;
         _passwordHasher = passwordHasher;
     }
-    public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
-    {
-        var users = await _unitOfWork.UserRepository.GetAllAsync();
-        var dto = users.Select(_userMapper.MapToSource).ToList();
 
-        return dto;
+    public IAsyncEnumerable<UserDTO> GetAll(int companyId)
+    {
+        var data = (from us in _unitOfWork.UserRepository.GetAllQueryable()
+                    join c in _unitOfWork.UserCompanyRepository.GetAllQueryable() on us.Id equals c.UserId
+                    where c.CompanyId == companyId
+                    group us by us.Id into grouped
+                    select new UserDTO
+                    {
+                        Id = grouped.Key,
+                        UserName = grouped.Select(g => g.UserName).FirstOrDefault(),
+                        Email = grouped.Select(g => g.Email).FirstOrDefault(),
+                    }).AsAsyncEnumerable();
+
+        return data;
     }
 
-    public async Task<UserDTO?> GetUserByIdAsync(string id)
+    public async Task<UserDTO?> GetByIdAsync(int companyId, string id)
     {
-        var user = await _unitOfWork.UserRepository.GetByIdAsync(id);
-        return _userMapper.MapToSource(user);
+        var data = await (from us in _unitOfWork.UserRepository.GetAllQueryable()
+                          join c in _unitOfWork.UserCompanyRepository.GetAllQueryable() on us.Id equals c.UserId
+                          where c.CompanyId == companyId && us.Id == id
+                          select new UserDTO
+                          {
+                              Id = us.Id,
+                              UserName = us.UserName,
+                              Email = us.Email,
+                          }).FirstOrDefaultAsync();
+
+        return data;
+    }
+
+    public async Task<UserDTO?> GetByIdAsync(string id)
+    {
+        var data = await (from us in _unitOfWork.UserRepository.GetAllQueryable()
+                          join c in _unitOfWork.UserCompanyRepository.GetAllQueryable() on us.Id equals c.UserId
+                          where us.Id == id
+                          select new UserDTO
+                          {
+                              Id = us.Id,
+                              UserName = us.UserName,
+                              Email = us.Email,
+                          }).FirstOrDefaultAsync();
+
+        return data;
     }
 
     public async Task<AspNetUser> AddUserAsync(AspNetUser entity)
@@ -83,6 +117,7 @@ public class UserService : IUserService
         await _unitOfWork.CompleteAsync();
         return aspNetUser;
     }
+
     public async Task<bool> SignInAsync(string username, string password)
     {
         var user = await _unitOfWork.UserRepository.GetByUserName(username);
@@ -95,6 +130,7 @@ public class UserService : IUserService
 
         return false;
     }
+
     public async Task UpdatePasswordAsync(AspNetUser user, string newPassword)
     {
         var newPasswordHash = _passwordHasher.HashPassword(user, newPassword);

@@ -42,7 +42,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
     {
         var token = await _tokenService.GetTokenAsync(refreshToken) ?? throw new UnauthorizedAccessException("Invalid or expired refresh token.");
 
-        var user = await _userService.GetUserByIdAsync(token.UserId) ?? throw new UnauthorizedAccessException("User not found.");
+        var user = await _userService.GetByIdAsync(token.UserId) ?? throw new UnauthorizedAccessException("User not found.");
 
         var (newAccessToken, tokenExpires) = GenerateJwtToken(user.Id.ToString());
         var newRefreshToken = GenerateRefreshToken();

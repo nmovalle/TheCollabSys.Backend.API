@@ -2,6 +2,7 @@
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using TheCollabSys.Backend.API.Extensions;
 using TheCollabSys.Backend.API.Filters;
 using TheCollabSys.Backend.API.Token;
 using TheCollabSys.Backend.Entity.Auth;
@@ -16,7 +17,7 @@ namespace TheCollabSys.Backend.API.Controllers;
 [ApiController]
 [ServiceFilter(typeof(GlobalExceptionFilter))]
 [ServiceFilter(typeof(ModelStateFilter))]
-public class UserController : ControllerBase
+public class UserController : BaseController
 {
     private readonly ILogger<UserController> _logger;
     private readonly IUserService _userService;
@@ -45,22 +46,33 @@ public class UserController : ControllerBase
         _jwtTokenGenerator = jwtTokenGenerator;
     }
 
-    [HttpGet("GetAllUsersAsync", Name = "GetAllUsersAsync")]
-    [ActionName(nameof(GetAllUsersAsync))]
-    public async Task<IActionResult> GetAllUsersAsync()
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
     {
-        return Ok(await _userService.GetAllUsersAsync());
+        return await ExecuteWithCompanyIdAsync(async (companyId) =>
+        {
+            var data = await _userService.GetAll(companyId).ToListAsync();
+
+            if (data.Any())
+                return CreateResponse("success", data, "success");
+
+            return CreateNotFoundResponse<object>(null, "Registers not founds");
+        });
     }
 
-    [HttpGet("GetUserByIdAsync/{id}", Name = "GetUserByIdAsync")]
-    [ActionName(nameof(GetUserByIdAsync))]
-    public async Task<IActionResult> GetUserByIdAsync(string id)
+    [HttpGet]
+    [Route("{id}")]
+    public async Task<IActionResult> GetById(string id)
     {
-        var entity = await _userService.GetUserByIdAsync(id);
-        if (entity == null)
-            return NotFound();
+        return await ExecuteWithCompanyIdAsync(async (companyId) =>
+        {
+            var data = await _userService.GetByIdAsync(companyId, id);
 
-        return Ok(entity);
+            if (data == null)
+                return CreateNotFoundResponse<object>(null, "register not found");
+
+            return CreateResponse("success", data, "success");
+        });
     }
 
     [HttpGet("GetUserByName/{username}", Name = "GetUserByName")]
@@ -72,20 +84,20 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    [ActionName(nameof(AddUserAsync))]
-    public async Task<IActionResult> AddUserAsync(UserDTO dto)
+    public async Task<IActionResult> AddUserAsync([FromForm] string dto)
     {
-        if (dto.UserName == null) return BadRequest();
+        return await this.HandleClientOperationAsync<UserDTO>(dto, null, async (model) =>
+        {
+            if (model.UserName == null) return BadRequest();
+            var existing = await _userService.GetUserByName(model.UserName);
+            if (existing != null) return BadRequest("The user is already exist");
 
-        var existing = await _userService.GetUserByName(dto.UserName);
-        if (existing != null) return BadRequest("The user is already exist");
+            model.Id = Guid.NewGuid().ToString();
 
-        dto.Id = Guid.NewGuid().ToString();
-        var entity = _mapperService.MapToDestination(dto);
-        var savedEntity = await _userService.AddUserAsync(entity);
-        var savedDTO = _mapperService.MapToSource(savedEntity);
-
-        return CreatedAtAction(nameof(GetUserByIdAsync), new { id = savedDTO.Id }, savedDTO);
+            var entity = _mapperService.MapToDestination(model);
+            var savedEntity = await _userService.AddUserAsync(entity);
+            return CreateResponse("success", savedEntity, "success");
+        });
     }
 
     [HttpPost("register")]
@@ -159,7 +171,7 @@ public class UserController : ControllerBase
         if (model == null)
             return BadRequest();
 
-        var user = await _userService.GetUserByIdAsync(model.Id);
+        var user = await _userService.GetByIdAsync(model.Id);
         if (user == null)
             return NotFound("User was not found");
 
@@ -195,7 +207,7 @@ public class UserController : ControllerBase
     [ActionName(nameof(DeleteUserAsync))]
     public async Task<IActionResult> DeleteUserAsync(string id)
     {
-        var existing = await _userService.GetUserByIdAsync(id);
+        var existing = await _userService.GetByIdAsync(id);
         if (existing == null) return NotFound();
 
         await _userService.DeleteUserAsync(id);
