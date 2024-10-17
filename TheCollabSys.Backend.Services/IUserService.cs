@@ -6,8 +6,9 @@ namespace TheCollabSys.Backend.Services;
 
 public interface IUserService
 {
-    Task<IEnumerable<UserDTO>> GetAllUsersAsync();
-    Task<UserDTO?> GetUserByIdAsync(string id);
+    IAsyncEnumerable<UserDTO> GetAll(int companyId);
+    Task<UserDTO?> GetByIdAsync(int companyId, string id);
+    Task<UserDTO?> GetByIdAsync(string id);
     Task<AspNetUser> AddUserAsync(AspNetUser entity);
     Task UpdateUserAsync(string id, UserDTO dto);
     Task DeleteUserAsync(string id);

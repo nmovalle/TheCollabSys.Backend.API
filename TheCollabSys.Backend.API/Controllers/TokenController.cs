@@ -55,7 +55,7 @@ namespace TheCollabSys.Backend.API.Controllers
         {
             if (string.IsNullOrEmpty(body.UserId)) return BadRequest("userid is required.");
 
-            var user = await _userService.GetUserByIdAsync(body.UserId);
+            var user = await _userService.GetByIdAsync(body.UserId);
             if (user == null) return NotFound("user not found.");
 
             var userRole = await GetUserRole(user.UserName);
