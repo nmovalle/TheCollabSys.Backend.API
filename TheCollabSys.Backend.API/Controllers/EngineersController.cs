@@ -9,7 +9,7 @@ using TheCollabSys.Backend.Services;
 
 namespace TheCollabSys.Backend.API.Controllers;
 
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+//[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] //vm comentar solo para probar para no requerir Token
 [Route("api/[controller]")]
 [ApiController]
 [ServiceFilter(typeof(GlobalExceptionFilter))]
@@ -32,11 +32,11 @@ public class EngineersController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllEngineers()
+    public async Task<IActionResult> GetAllEngineers([FromQuery] int? engineerId = null) //[FromQuery] para aceptar el parámetro opcional engineerId en la URL (/api/engineers?engineerId=123) VMP
     {
         return await ExecuteWithCompanyIdAsync(async (companyId) =>
         {
-            var data = await _service.GetAll(companyId).ToListAsync();
+            var data = await _service.GetAll(companyId, engineerId).ToListAsync(); //agrego filtro opcional engineerId
 
             if (data.Any())
                 return CreateResponse("success", data, "success");
@@ -44,6 +44,7 @@ public class EngineersController : BaseController
             return CreateNotFoundResponse<object>(null, "Registers not founds");
         });
     }
+
 
     [HttpGet]
     [Route("GetDetail")]
