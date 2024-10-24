@@ -9,7 +9,7 @@ using TheCollabSys.Backend.Services;
 
 namespace TheCollabSys.Backend.API.Controllers;
 
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] //vm comentar solo para probar para no requerir Token
+//[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] //vm comentar solo para probar para no requerir Token
 [Route("api/[controller]")]
 [ApiController]
 [ServiceFilter(typeof(GlobalExceptionFilter))]
@@ -32,11 +32,11 @@ public class EngineersController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllEngineers([FromQuery] int? engineerId = null) //[FromQuery] para aceptar el parámetro opcional engineerId en la URL (/api/engineers?engineerId=123) VMP
+    public async Task<IActionResult> GetAllEngineers([FromQuery] string email = null) //[FromQuery] para aceptar el parámetro opcional engineerId en la URL (/api/engineers?email=valerio@gmail.com VMP
     {
         return await ExecuteWithCompanyIdAsync(async (companyId) =>
         {
-            var data = await _service.GetAll(companyId, engineerId).ToListAsync(); //agrego filtro opcional engineerId
+            var data = await _service.GetAll(companyId, email).ToListAsync(); //agrego filtro opcional engineerId
 
             if (data.Any())
                 return CreateResponse("success", data, "success");
@@ -48,11 +48,11 @@ public class EngineersController : BaseController
 
     [HttpGet]
     [Route("GetDetail")]
-    public async Task<IActionResult> GetDetail()
+    public async Task<IActionResult> GetDetail([FromQuery] string email = null)
     {
         return await ExecuteWithCompanyIdAsync(async (companyId) =>
         {
-            var data = await _service.GetDetail(companyId).ToListAsync();
+            var data = await _service.GetDetail(companyId, email).ToListAsync();
 
             if (data.Any())
                 return CreateResponse("success", data, "success");
