@@ -5,7 +5,7 @@ namespace TheCollabSys.Backend.Services;
 
 public interface IEngineerService
 {
-    IAsyncEnumerable<EngineerDTO> GetAll(int companyId);
+    IAsyncEnumerable<EngineerDTO> GetAll(int companyId, int? engineerId = null); //se agrega filtro por engineerId
     IAsyncEnumerable<EngineerSkillDetailDTO> GetDetail(int companyId);
     IAsyncEnumerable<EngineerDTO> GetEngineersByProjectSkillsAsync(int companyId, int projectId);
     Task<EngineerDTO?> GetByIdAsync(int companyId, int id);

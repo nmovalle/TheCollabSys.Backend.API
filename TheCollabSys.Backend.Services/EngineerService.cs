@@ -18,27 +18,33 @@ public class EngineerService : IEngineerService
         _mapperService = mapperService;
     }
 
-    public IAsyncEnumerable<EngineerDTO> GetAll(int companyId)
+    public IAsyncEnumerable<EngineerDTO> GetAll(int companyId, int? engineerId = null)
     {
-        var data = _unitOfWork.EngineerRepository.GetAllQueryable()
-            .Where(c => c.CompanyId == companyId)
-            .Select(c => new EngineerDTO
-            {
-                EngineerId = c.EngineerId,
-                EmployerId = c.EmployerId,
-                EmployerName = c.Employer.EmployerName,
-                FirstName = c.FirstName,
-                LastName = c.LastName,
-                Email = c.Email,
-                Phone = c.Phone,
-                Image = c.Image,
-                Filetype = c.Filetype,
-                DateCreated = c.DateCreated,
-                DateUpdate = c.DateUpdate,
-                IsActive = c.IsActive,
-                UserId = c.UserId
-            })
-            .AsAsyncEnumerable();
+        var query = _unitOfWork.EngineerRepository.GetAllQueryable()
+       .Where(c => c.CompanyId == companyId); // Filtro por CompanyId VMP
+
+        if (engineerId.HasValue)
+        {
+            query = query.Where(c => c.EngineerId == engineerId.Value); // Filtro por EngineerId VMP
+        }
+
+        // Usar la consulta filtrada para proyectar el resultado en EngineerDTO
+        var data = query.Select(c => new EngineerDTO
+        {
+            EngineerId = c.EngineerId,
+            EmployerId = c.EmployerId,
+            EmployerName = c.Employer.EmployerName,
+            FirstName = c.FirstName,
+            LastName = c.LastName,
+            Email = c.Email,
+            Phone = c.Phone,
+            Image = c.Image,
+            Filetype = c.Filetype,
+            DateCreated = c.DateCreated,
+            DateUpdate = c.DateUpdate,
+            IsActive = c.IsActive,
+            UserId = c.UserId
+        }).AsAsyncEnumerable();
 
         return data;
     }
