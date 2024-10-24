@@ -20,9 +20,10 @@ public class CompanyService : ICompanyService
         _mapperService = mapperService;
     }
 
-    public IAsyncEnumerable<CompanyDTO> GetAll()
+    public IAsyncEnumerable<CompanyDTO> GetAll(int companyId)
     {
         var data = _unitOfWork.CompanyRepository.GetAllQueryable()
+            .Where(x => x.CompanyId == companyId)
             .Select(c => new CompanyDTO
             {
                 CompanyId = c.CompanyId,

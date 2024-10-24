@@ -25,12 +25,12 @@ public class CompanyController : BaseController
         _mapper = mapperService;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
+    [HttpGet("GetAll/{companyId}")]
+    public async Task<IActionResult> GetAll(int companyId)
     {
         return await ExecuteAsync(async () =>
         {
-            var data = await _service.GetAll().ToListAsync();
+            var data = await _service.GetAll(companyId).ToListAsync();
 
             if (data.Any())
                 return CreateResponse("success", data, "success");
@@ -82,14 +82,13 @@ public class CompanyController : BaseController
 
     [HttpPut]
     [Route("{id}")]
-    public async Task<IActionResult> Update(int id, [FromForm] string dto)
+    public async Task<IActionResult> Update(int id, [FromForm] string dto, [FromForm] IFormFile? file)
     {
-        var existing = await _service.GetByIdAsync(id);
-        if (existing == null)
-            return NotFound("Register not found");
-
-        return await HandleClientOperationAsync<CompanyDTO>(dto, null, async (model) =>
+        return await this.HandleClientOperationAsync<CompanyDTO>(dto, file, async (model) =>
         {
+            var existing = await _service.GetByIdAsync(id);
+            if (existing == null) return NotFound();
+
             await _service.Update(id, model);
             return NoContent();
         });
