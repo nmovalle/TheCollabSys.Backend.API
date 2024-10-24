@@ -18,32 +18,39 @@ public class EngineerService : IEngineerService
         _mapperService = mapperService;
     }
 
-    public IAsyncEnumerable<EngineerDTO> GetAll(int companyId)
+    public IAsyncEnumerable<EngineerDTO> GetAll(int companyId, string email = null)
     {
-        var data = _unitOfWork.EngineerRepository.GetAllQueryable()
-            .Where(c => c.CompanyId == companyId)
-            .Select(c => new EngineerDTO
-            {
-                EngineerId = c.EngineerId,
-                EmployerId = c.EmployerId,
-                EmployerName = c.Employer.EmployerName,
-                FirstName = c.FirstName,
-                LastName = c.LastName,
-                Email = c.Email,
-                Phone = c.Phone,
-                Image = c.Image,
-                Filetype = c.Filetype,
-                DateCreated = c.DateCreated,
-                DateUpdate = c.DateUpdate,
-                IsActive = c.IsActive,
-                UserId = c.UserId
-            })
-            .AsAsyncEnumerable();
+        var query = _unitOfWork.EngineerRepository.GetAllQueryable()
+       .Where(c => c.CompanyId == companyId); // Filtro por CompanyId VMP
+
+        // Filtro opcional por Email
+        if (!string.IsNullOrEmpty(email))
+        {
+            query = query.Where(c => c.Email == email);
+        }
+
+        // Usar la consulta filtrada para proyectar el resultado en EngineerDTO
+        var data = query.Select(c => new EngineerDTO
+        {
+            EngineerId = c.EngineerId,
+            EmployerId = c.EmployerId,
+            EmployerName = c.Employer.EmployerName,
+            FirstName = c.FirstName,
+            LastName = c.LastName,
+            Email = c.Email,
+            Phone = c.Phone,
+            Image = c.Image,
+            Filetype = c.Filetype,
+            DateCreated = c.DateCreated,
+            DateUpdate = c.DateUpdate,
+            IsActive = c.IsActive,
+            UserId = c.UserId
+        }).AsAsyncEnumerable();
 
         return data;
     }
 
-    public IAsyncEnumerable<EngineerSkillDetailDTO> GetDetail(int companyId)
+    public IAsyncEnumerable<EngineerSkillDetailDTO> GetDetail(int companyId, string email = null)
     {
         var data = (from e in _unitOfWork.EngineerRepository.GetAllQueryable()
                     join em in _unitOfWork.EmployerRepository.GetAllQueryable() on e.EmployerId equals em.EmployerId
@@ -54,6 +61,8 @@ public class EngineerService : IEngineerService
                     join s in _unitOfWork.SkillRepository.GetAllQueryable() on es.SkillId equals s.SkillId into sGroup
                     from s in sGroup.DefaultIfEmpty()
                     where e.CompanyId == companyId
+                    // Filtrar por Email si se proporciona
+                    && (string.IsNullOrEmpty(email) || e.Email == email)
                     group new { es, e, em, s } by new
                     {
                         e.EngineerId,
