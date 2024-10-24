@@ -5,7 +5,7 @@ namespace TheCollabSys.Backend.Services;
 
 public interface ICompanyService
 {
-    IAsyncEnumerable<CompanyDTO> GetAll();
+    IAsyncEnumerable<CompanyDTO> GetAll(int companyId);
     Task<CompanyDTO?> GetByIdAsync(int id);
     Task<CompanyDTO?> GetByIdDomainAsync(string domain);
     Task<DdCompany> Create(DdCompany entity);
