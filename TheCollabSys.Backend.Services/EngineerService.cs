@@ -18,14 +18,15 @@ public class EngineerService : IEngineerService
         _mapperService = mapperService;
     }
 
-    public IAsyncEnumerable<EngineerDTO> GetAll(int companyId, int? engineerId = null)
+    public IAsyncEnumerable<EngineerDTO> GetAll(int companyId, string email = null)
     {
         var query = _unitOfWork.EngineerRepository.GetAllQueryable()
        .Where(c => c.CompanyId == companyId); // Filtro por CompanyId VMP
 
-        if (engineerId.HasValue)
+        // Filtro opcional por Email
+        if (!string.IsNullOrEmpty(email))
         {
-            query = query.Where(c => c.EngineerId == engineerId.Value); // Filtro por EngineerId VMP
+            query = query.Where(c => c.Email == email);
         }
 
         // Usar la consulta filtrada para proyectar el resultado en EngineerDTO
@@ -49,7 +50,7 @@ public class EngineerService : IEngineerService
         return data;
     }
 
-    public IAsyncEnumerable<EngineerSkillDetailDTO> GetDetail(int companyId)
+    public IAsyncEnumerable<EngineerSkillDetailDTO> GetDetail(int companyId, string email = null)
     {
         var data = (from e in _unitOfWork.EngineerRepository.GetAllQueryable()
                     join em in _unitOfWork.EmployerRepository.GetAllQueryable() on e.EmployerId equals em.EmployerId
@@ -60,6 +61,8 @@ public class EngineerService : IEngineerService
                     join s in _unitOfWork.SkillRepository.GetAllQueryable() on es.SkillId equals s.SkillId into sGroup
                     from s in sGroup.DefaultIfEmpty()
                     where e.CompanyId == companyId
+                    // Filtrar por Email si se proporciona
+                    && (string.IsNullOrEmpty(email) || e.Email == email)
                     group new { es, e, em, s } by new
                     {
                         e.EngineerId,
